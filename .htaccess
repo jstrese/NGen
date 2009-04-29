@@ -1,0 +1,54 @@
+#################################
+#         NGen 2, v0.2.6        #
+#################################
+
+# Uncomment the line below to register
+# .rss as a valid extension
+# AddType application/rss+xml .rss
+
+# Disable directory listing
+IndexIgnore *
+
+# Follow symbolic links
+Options +FollowSymLinks
+
+# It's generally a good idea to set an
+# expire time.
+<IfModule expires_module>
+	ExpiresActive On
+	ExpiresDefault "access plus 1 month"
+</IfModule>
+
+# Vital / Hidden / potentially personal file types
+<FilesMatch "\.(ini|htaccess|tpl|xml|phps)$">
+	order deny,allow
+	deny from all
+</FilesMatch>
+
+<Files config.php>
+	order deny,allow
+	deny from all
+</Files>
+
+<IfModule rewrite_module>
+	# Turn the rewrite engine on
+	RewriteEngine on
+	
+	# Relative path to the site (starting at the document root)
+	RewriteBase /NGen2.1/
+	
+	# Set a couple conditions
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+		
+	# Image Repository
+	RewriteRule image/([^/]+)/([^/]+)\.([A-Za-z]{3,4})$ Images/$1/$2.$3
+	# Style Repository
+	RewriteRule assets/([^/]+)/([^/]+)\.([A-Za-z]{3,4})$ Styles/$1/style/$2.$3
+	# Section + Action
+	RewriteRule ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$ index.php?s=$1&a=$2 [L,QSA]
+	# Section only
+	RewriteRule ^([A-Za-z0-9-]+)/?$ index.php?s=$1&a=main [L,QSA]
+	# Default.. nothing
+	RewriteRule ^/?$ index.php?s=home&a=main [L,QSA]
+</IfModule>
