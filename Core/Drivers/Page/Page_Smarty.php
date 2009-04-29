@@ -29,7 +29,7 @@
 		/**
 		 * Action Object
 		 */
-		public $actObj = null;
+		private $actObj = false;
 		/**
 		 * Stored reference
 		 * @static
@@ -58,8 +58,9 @@
 		{
 			if(!$error)
 			{
-				$this->section = $this->isvalid($section) ? strtolower($section) : DEFAULT_SECTION;
-				$this->action  = $this->isvalid($action) ? strtolower($action) : DEFAULT_ACTION;
+				// revert if conflicts occur
+				$this->section = isset($section[0]) ? strtolower($section) : DEFAULT_SECTION;
+				$this->action  = isset($action[0]) ? strtolower($action) : DEFAULT_ACTION;
 							
 				// Determine the route we will take (section, action)
 				$this->route();
@@ -140,7 +141,7 @@
 			if(file_exists(SECTION_DIR . $section . '/' . $action . '.php'))
 			{
 				require_once(SECTION_DIR . $section . '/' . $action . '.php');
-				$this->actObj = new Action();
+				$this->actObj = true;
 			}
 		}
 				
@@ -176,15 +177,14 @@
 		
 		/**
 		 * Checks the integrity and length of a variable to ensure we are getting something
+		 * Prior to 2.1, we checked with isset() -and- empty(), will revert if this change
+		 * causes conflicts.
 		 * @return boolean
+		 * @deprecated
 		 */
 		private function isvalid($what)
 		{
-			if(!isset($what) || empty($what))
-			{
-				return false;
-			}
-			return true;
+			return isset($what[0]);
 		}
 														
 		/**
@@ -192,14 +192,20 @@
 		 */
 		public function load()
 		{
-			if(isset($this->actObj->caching))
+			
+			if(isset(Action::$caching))
 			{
-				$this->caching = $this->actObj->caching;
+				$this->caching = Action::$caching;
 			}
 			
-			if(isset($this->actObj->lifetime))
+			if(isset(Action::$lifetime))
 			{
-				$this->cache_lifetime = $this->actObj->lifetime;
+				$this->caching_lifetime = Action::$lifetime;
+			}
+			
+			if(isset(Action::$cache_uid))
+			{
+				$this->cache_id = Action::$cache_uid;
 			}
 			
 			// Before we run the desired page.. run default script!
@@ -216,22 +222,25 @@
 			// Set the base url for links
 			$this->assign('base_url', NGenCore::$configs['document_root']);
 
-			if($this->actObj !== null)
+			if($this->actObj)
 			{
 				if($this->caching)
 				{
-					if(!$this->is_cached($this->tpl))
+					if(!$this->is_cached($this->tpl, $this->cache_id) && method_exists('Action', 'run'))
 					{
-						$this->actObj->run();
+						Action::run();
 					}
 				}
 				else
 				{
-					$this->actObj->run();				
+					if(method_exists('Action', 'run'))
+					{
+						Action::run();
+					}				
 				}
 			}
 			
-			if(!isset($this->actObj->silence) || $this->actObj->silence !== true)
+			if(!isset(Action::$silence) || Action::$silence !== true)
 			{
 				$this->display($this->tpl);
 			}

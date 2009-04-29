@@ -1,6 +1,6 @@
 <?php
 	interface Interface_StandardAction
 	{
-		public function run();
+		/* content removed in favor of static, optional run method -- this may be used later, though */
 	}
 ?>

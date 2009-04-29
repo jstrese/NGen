@@ -1,27 +1,30 @@
 <?php
 	class Action implements Interface_StandardAction
 	{
-		//public $caching = false;
-		//public $lifetime = 10;
+		//
+		// $caching must be set to true for any caching to happen
+		//
+		// static public $caching = true;
 		
-		public function run()
-		{
-			/* Database example
-			
-			// $db = Database::getPoolItem(0); -- this is used for pooling, if you have only one connection, do not use this (pooling is meant to deal with multiple databases)
-			$db = Database::getInstance(); // No pooling, use for single database setups
-			
-			$prep = $db->prepare('SELECT * FROM clients');
-			
-			// output the data
-			if($prep->execute())
-			{
-				print_r($prep->fetchAll());
-			}
-			
-			// destroy instance/disconnect from database/close connection .. whatever you want to call it.
-			Database::$instance = null;
-			*/
+		//
+		//  $lifetime is the time (in seconds) the cache is good for
+		//
+		// static public $lifetime = 5;
+		
+		//
+		// $cache_uid gives the cache a unique id -- useful for caching the
+		// same page twice but with different/altered content
+		//
+		// static public $cache_uid = 'foo';
+		
+		//
+		// run() is actually optional now
+		// This way you can provide cache information without running anything
+		// just comment the function out, or remove it from the source file if
+		// you don't use it.
+		//
+		static public function run() {
+			// ...
 		}
 	}
 ?>
