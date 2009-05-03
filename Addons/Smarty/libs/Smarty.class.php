@@ -48,6 +48,13 @@ define('SMARTY_ROOT_SCOPE', 2);
 define('SMARTY_GLOBAL_SCOPE', 3);
 
 /**
+* define caching modes
+*/
+define('SMARTY_CACHING_OFF', 0);
+define('SMARTY_CACHING_LIFETIME_CURRENT', 1);
+define('SMARTY_CACHING_LIVETIME_SAVED', 2);
+
+/**
 * load required base class for creation of the smarty object
 */
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sysplugins' . DIRECTORY_SEPARATOR . 'internal.templatebase.php');
@@ -69,7 +76,7 @@ class Smarty extends Smarty_Internal_TemplateBase {
     // compile directory
     public $compile_dir = null; 
     // plugins directory
-    public $plugins_dir = null;
+    public $plugins_dir = null; 
     // cache directory
     public $cache_dir = null; 
     // config directory
@@ -111,7 +118,7 @@ class Smarty extends Smarty_Internal_TemplateBase {
     // config var settings
     public $config_overwrite = true; //Controls whether variables with the same name overwrite each other.
     public $config_booleanize = true; //Controls whether config values of on/true/yes and off/false/no get converted to boolean
-    public $config_read_hidden = true; //Controls whether hidden config sections/vars are read from the file.          
+    public $config_read_hidden = true; //Controls whether hidden config sections/vars are read from the file.             
     // config vars
     public $config_vars = array(); 
     // assigned tpl vars
@@ -119,7 +126,9 @@ class Smarty extends Smarty_Internal_TemplateBase {
     // assigned global tpl vars
     public $global_tpl_vars = array(); 
     // dummy parent object
-    public $parent = null; 
+    public $parent = null;
+    // global template functions
+    public $template_functions = null; 
     // system plugins directory
     private $sysplugins_dir = null; 
     // resource type used if none given
@@ -172,15 +181,27 @@ class Smarty extends Smarty_Internal_TemplateBase {
     * Class constructor, initializes basic smarty properties
     */
     public function __construct()
-    {
+    { 
         // set instance object
-        self::instance($this); 
+        self::instance($this);
 
-		$this->has_mb = true;
-		mb_internal_encoding($this->resource_char_set);
-		
+        if (is_callable('mb_internal_encoding')) {
+            $this->has_mb = true;
+            mb_internal_encoding($this->resource_char_set);
+        } 
+        /*if (function_exists("date_default_timezone_set")) {
+            date_default_timezone_set(date_default_timezone_get());
+        }*/ 
+        $this->start_time = $this->_get_time(); 
+        // set exception handler
+        if (!empty($this->exception_handler))
+            set_exception_handler($this->exception_handler); 
         // set default dirs
+        //$this->template_dir = array('.' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
+        //$this->compile_dir = '.' . DIRECTORY_SEPARATOR . 'templates_c' . DIRECTORY_SEPARATOR;
         $this->plugins_dir = array(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR);
+        //$this->cache_dir = '.' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+        //$this->config_dir = '.' . DIRECTORY_SEPARATOR . 'configs' . DIRECTORY_SEPARATOR;
         $this->sysplugins_dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'sysplugins' . DIRECTORY_SEPARATOR;
         $this->debug_tpl = SMARTY_DIR . 'debug.tpl'; 
         // load base plugins
@@ -191,8 +212,12 @@ class Smarty extends Smarty_Internal_TemplateBase {
         $this->plugin_handler = new Smarty_Internal_Plugin_Handler;
         $this->loadPlugin('Smarty_Internal_Run_Filter');
         $this->filter_handler = new Smarty_Internal_Run_Filter;
-        /*if (!$this->debugging && $this->debugging_ctrl == 'URL') {
-            $_query_string = $this->request_use_auto_globals ? isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING']:'' : isset($GLOBALS['HTTP_SERVER_VARS']['QUERY_STRING']) ? $GLOBALS['HTTP_SERVER_VARS']['QUERY_STRING']:'';
+        if (!$this->debugging && $this->debugging_ctrl == 'URL') {
+            if (isset($_SERVER['QUERY_STRING'])) {
+                $_query_string = $_SERVER['QUERY_STRING'];
+            } else {
+                $_query_string = '';
+            } 
             if (false !== strpos($_query_string, $this->smarty_debug_id)) {
                 if (false !== strpos($_query_string, $this->smarty_debug_id . '=on')) {
                     // enable debugging for this browser session
@@ -213,7 +238,7 @@ class Smarty extends Smarty_Internal_TemplateBase {
                     $this->debugging = true;
                 } 
             } 
-        }*/ 
+        }
     } 
 
     /**
@@ -332,7 +357,7 @@ class Smarty extends Smarty_Internal_TemplateBase {
     */
     public function setTemplateDir($template_dir)
     {
-        $this->smarty->template_dir = (array)$template_dir;
+        $this->template_dir = (array)$template_dir;
         return;
     } 
     /**
@@ -342,8 +367,8 @@ class Smarty extends Smarty_Internal_TemplateBase {
     */
     public function addTemplateDir($template_dir)
     {
-        $this->smarty->template_dir = array_merge((array)$this->smarty->template_dir, (array)$template_dir);
-        $this->smarty->template_dir = array_unique($this->smarty->template_dir);
+        $this->template_dir = array_merge((array)$this->template_dir, (array)$template_dir);
+        $this->template_dir = array_unique($this->template_dir);
         return;
     } 
     /**
@@ -353,7 +378,7 @@ class Smarty extends Smarty_Internal_TemplateBase {
     */
     public function setCompileDir($compile_dir)
     {
-        $this->smarty->compile_dir = $compile_dir;
+        $this->compile_dir = $compile_dir;
         return;
     } 
     /**
@@ -363,7 +388,7 @@ class Smarty extends Smarty_Internal_TemplateBase {
     */
     public function setCacheDir($cache_dir)
     {
-        $this->smarty->cache_dir = $cache_dir;
+        $this->cache_dir = $cache_dir;
         return;
     } 
     /**
@@ -371,7 +396,7 @@ class Smarty extends Smarty_Internal_TemplateBase {
     */
     public function enableCaching()
     {
-        $this->smarty->caching = true;
+        $this->caching = true;
         return;
     } 
     /**
@@ -381,7 +406,7 @@ class Smarty extends Smarty_Internal_TemplateBase {
     */
     public function setCachingLifetime($lifetime)
     {
-        $this->smarty->caching_lifetime = $lifetime;
+        $this->caching_lifetime = $lifetime;
         return;
     } 
     /**
@@ -422,8 +447,8 @@ class Smarty extends Smarty_Internal_TemplateBase {
         // loop through plugin dirs and find the plugin
         foreach((array)$this->plugins_dir as $plugin_dir) {
             if (file_exists($plugin_dir . $plugin_filename)) {
-                require_once($plugin_dir . $plugin_filename);
-                return true;
+                   require_once($plugin_dir . $plugin_filename);
+                    return true;
             } 
         } 
         // no plugin loaded
