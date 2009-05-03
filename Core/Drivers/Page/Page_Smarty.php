@@ -191,24 +191,8 @@
 		 * Performs the page action and displays the page [if not silenced]
 		 */
 		public function load()
-		{
-			
-			if(isset(Action::$caching))
-			{
-				$this->caching = Action::$caching;
-			}
-			
-			if(isset(Action::$lifetime))
-			{
-				$this->caching_lifetime = Action::$lifetime;
-			}
-			
-			if(isset(Action::$cache_uid))
-			{
-				$this->cache_id = Action::$cache_uid;
-			}
-			
-			// Before we run the desired page.. run default script!
+		{			
+			// Before we run the desired page.. run the default script!
 			require_once(SECTION_DIR . '.default/' . DEFAULT_ACTION . '.php');
 			
 			new DefaultAction();
@@ -224,6 +208,21 @@
 
 			if($this->actObj)
 			{
+				if(isset(Action::$caching))
+				{
+					$this->caching = Action::$caching;
+				}
+				
+				if(isset(Action::$lifetime))
+				{
+					$this->caching_lifetime = Action::$lifetime;
+				}
+				
+				if(isset(Action::$cache_uid))
+				{
+					$this->cache_id = Action::$cache_uid;
+				}
+				
 				if($this->caching)
 				{
 					if(!$this->is_cached($this->tpl, $this->cache_id) && method_exists('Action', 'run'))
@@ -238,9 +237,13 @@
 						Action::run();
 					}				
 				}
+				
+				if(!isset(Action::$silence) || Action::$silence !== true)
+				{
+					$this->display($this->tpl);
+				}
 			}
-			
-			if(!isset(Action::$silence) || Action::$silence !== true)
+			else
 			{
 				$this->display($this->tpl);
 			}
