@@ -134,7 +134,7 @@
 		
 		/**
 		 * Checks for a valid Action object. There does not need to be an Action; if it's not found then it's just not executed.
-		 * @return Null Does not return anything. However, if the action exists then $actObj gets set to new instance of Action
+		 * @return Null Does not return anything. However, if the action exists then $actObj gets set to true
 		 */
 		public function actionExists($section, $action)
 		{
@@ -147,7 +147,7 @@
 				
 		/**
 		 * Returns the constructed page object
-		 * @example Page_Smarty::getInstance()
+		 * @example Page::getInstance()
 		 * @return Page_Smarty
 		 * @static
 		 */
@@ -162,7 +162,7 @@
 		
 		/**
 		 * Returns a constructed Page object if one is not already constructed. This is used ONLY for Exception/Error handling!
-		 * @example Page_Smarty::getInstance2()
+		 * @example Page::getInstance2()
 		 * @return Page_Smarty
 		 * @static
 		 */
@@ -240,12 +240,12 @@
 				
 				if(!isset(Action::$silence) || Action::$silence !== true)
 				{
-					$this->display($this->tpl);
+					$this->display($this->tpl, null, $this->cache_id);
 				}
 			}
 			else
 			{
-				$this->display($this->tpl);
+				$this->display($this->tpl, null, $this->cache_id);
 			}
 		}
 		
