@@ -1,5 +1,5 @@
 <?php 
-	class DefaultAction implements Interface_DefaultAction
+	class DefaultAction
 	{	
 		//
 		// This function is optional

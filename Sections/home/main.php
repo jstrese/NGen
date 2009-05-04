@@ -1,5 +1,5 @@
 <?php
-	class Action implements Interface_StandardAction
+	class Action
 	{
 		//
 		// $caching must be set to true for any caching to happen
