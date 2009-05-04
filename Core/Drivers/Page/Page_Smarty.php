@@ -31,6 +31,10 @@
 		 */
 		private $actObj = false;
 		/**
+		 * Are we using the default action feature?
+		 */
+	 	private $use_default = true;
+		/**
 		 * Stored reference
 		 * @static
 		 */
@@ -54,7 +58,7 @@
 		 */
 		const CACHE_DYNAMIC = 2;
 				
-		public function __construct($section, $action, $cache = self::CACHE_DISABLED, $caching_lifetime = 86400, $error = false)
+		public function __construct($section, $action, $cache = self::CACHE_DISABLED, $caching_lifetime = 86400, $use_default = true, $error = false)
 		{
 			if(!$error)
 			{
@@ -155,7 +159,7 @@
 		{
 			if(self::$instance === null)
 			{
-				new self(NGenCore::$configs['__section'], NGenCore::$configs['__action'], NGenCore::$configs['cache'], NGenCore::$configs['page_cache_lifetime'], false);
+				new self(NGenCore::$configs['__section'], NGenCore::$configs['__action'], NGenCore::$configs['cache'], NGenCore::$configs['page_cache_lifetime'], (bool)NGenCore::$configs['use_default_actions']);
 			}
 			return self::$instance;
 		}
@@ -170,7 +174,7 @@
 		{
 			if(self::$instance === null)
 			{
-				new self('', '', self::CACHE_DISABLED, 0, true);
+				new self('', '', self::CACHE_DISABLED, 0, false, true);
 			}
 			return self::$instance;
 		}
@@ -186,16 +190,48 @@
 		{
 			return isset($what[0]);
 		}
+		
+		/**
+		 * If default actions are enabled (see: $use_default), we attempt to load the default
+		 * action. Once loaded, we check for two things: a function that executes on every
+		 * page for every section (DefaultAction::section_all()), and a function for
+		 * section-specific usage (DefaultAction::section_<section>()). Both of these
+		 * functions are optional, and are only called if they exist.
+		 * @private
+		 * @since 2.1
+		 * @return Null Does not return anything.
+		 */
+		private function defaultAction()
+		{
+			if(file_exists(SECTION_DIR . '.default/' . DEFAULT_ACTION . '.php'))
+			{
+				require_once(SECTION_DIR . '.default/' . DEFAULT_ACTION . '.php');
+				
+				// Try to run DefaultAction::section_all() -- which affects all pages, in all sections
+				if(method_exists('DefaultAction', 'section_all'))
+				{
+					DefaultAction::section_all();
+				}
+				
+				// Try to run section-specific default action (section_*)
+				if(method_exists('DefaultAction', 'section_'.$this->section))
+				{
+					call_user_func('DefaultAction::section_'.$this->section);
+				}
+			}
+		}
 														
 		/**
 		 * Performs the page action and displays the page [if not silenced]
+		 * @public
 		 */
 		public function load()
 		{
-			// Before we run the desired page.. run the default script!
-			require_once(SECTION_DIR . '.default/' . DEFAULT_ACTION . '.php');
-			
-			new DefaultAction();
+			// Attempts to run the default action (if enabled)
+			if($this->use_default)
+			{
+				$this->defaultAction();
+			}
 
 			// Variables for use in the page
 			$this->assign(array(

@@ -32,6 +32,14 @@
 	// Name of the theme; /Styles/[theme]/
 	$configs['theme'] = 'ngen';
 	
+	//
+	// Default actions can be very useful, however for demonstration
+	// purposes, it is disabled by default. Default actions can be
+	// configured if this is true, see /Sections/.default/main.php
+	// for configuration.
+	//
+	$configs['use_default_actions'] = false;
+	
 	// Default timezone
 	// Valid timezones: http://us2.php.net/manual/en/timezones.php
 	$configs['timezone'] = 'America/Chicago';

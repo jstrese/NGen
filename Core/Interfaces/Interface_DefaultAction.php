@@ -1,6 +1,6 @@
 <?php
 	interface Interface_DefaultAction
 	{
-		public function __construct();
+		/* content removed in favor of static, optional run method -- this may be used later, though */
 	}
 ?>
