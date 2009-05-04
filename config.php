@@ -12,7 +12,7 @@
 	$configs['db'][0]['driver'] = NGenCore::SQL_NONE;
 
 	// Document root (path to this file)
-	$configs['document_root'] = '/NGen2/';
+	$configs['document_root'] = '/NGen2.1/';
 	// Page driver type [None, Smarty, XPOP]
 	$configs['page_driver'] = NGenCore::PAGE_SMARTY;
 	// How long the cache lasts
