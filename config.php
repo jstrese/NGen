@@ -1,4 +1,7 @@
 <?php
+	// Title of the site
+	$configs['site_title'] = 'N-Gen';
+
 	// Database settings
 	$configs['db'][0]['user'] = '';
 	$configs['db'][0]['pass'] = '';

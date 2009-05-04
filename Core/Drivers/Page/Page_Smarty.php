@@ -191,20 +191,20 @@
 		 * Performs the page action and displays the page [if not silenced]
 		 */
 		public function load()
-		{			
+		{
 			// Before we run the desired page.. run the default script!
 			require_once(SECTION_DIR . '.default/' . DEFAULT_ACTION . '.php');
 			
 			new DefaultAction();
-			
-			// Set the section & action (trakback)
+
+			// Variables for use in the page
 			$this->assign(array(
 				'section' => $this->section,
-				'action' => $this->action
+				'action' => $this->action,
+				'base_url' => NGenCore::$configs['document_root'],
+				'site_title' => NGenCore::$configs['site_title'],
+				'page_desc' => ucwords(($this->actObj && isset(Action::$description)) ? (substr(Action::$description, -6) === '|more|' ? rtrim(Action::$description, '|more|').'- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:''): Action::$description) : '- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:''))
 			));
-			
-			// Set the base url for links
-			$this->assign('base_url', NGenCore::$configs['document_root']);
 
 			if($this->actObj)
 			{

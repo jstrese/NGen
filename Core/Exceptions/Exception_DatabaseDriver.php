@@ -4,7 +4,7 @@
 		public $type = 'database';
 		public function __construct($message, $code = '00000')
 		{
-			parent::__construct($message, $code . 'kkk');
+			parent::__construct($message, $code);
 		}
 	}
 ?>
