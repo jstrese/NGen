@@ -4,6 +4,7 @@
 		/**
 		 * References this specific instance, once constructed
 		 * @static
+		 * @protected
 		 */
 		static protected $instance = null;
 		
@@ -34,7 +35,7 @@
 	 	/**
 	 	 * Returns the constructed instance
 	 	 * @example $session = Driver_Session::getInstance()
-	 	 * @example print Driver_Session::getInstance()->foo
+	 	 * @example print Session::getInstance()->foo
 	 	 * @static
 	 	 * @return Session Constructed session object
 	 	 */
@@ -75,7 +76,7 @@
 		}
 		
 		/**
-		 * Magic method __get( $var )
+		 * Magic method __get($var)
 		 * @example $session->foo
 		 * @static
 		 * @return mixed
@@ -89,7 +90,7 @@
 		}
 		
 		/**
-		 * Magic method __set( $var, $val ); sets session information
+		 * Magic method __set($var, $val); sets session information
 		 * @example $session->foo = 'baz'
 		 * @static
 		 */
@@ -99,8 +100,8 @@
 		}
 		
 		/**
-		 * Magic method __isset( $var )
-		 * @example isset( $session->foo )
+		 * Magic method __isset($var)
+		 * @example isset($session->foo)
 		 * @static
 		 * @return boolean
 		 */
