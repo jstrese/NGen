@@ -4,16 +4,16 @@
 		/**
 		 * Witholds the current database connection object
 		 * @staticvar
-		 * @public
+		 * @protected
 		 */
-		static public $instance = null;
+		static protected $instance = null;
 		
 		/**
 		 * Stores pooled database connections
 		 * @staticvar
-		 * @public
+		 * @protected
 		 */
-		static public $pool		= array();
+		static protected $pool = array();
 		
 		/**
 		 * Retrieves the current database connection object. If it isn't formed, it is created and connected.
@@ -33,14 +33,14 @@
 						return null;
 						break;
 					case NGenCore::SQL_MYSQL:
-						new Database_MySQL(false, $id);
+						self::$instance = new Database_MySQL(false, $id);
 						break;
 					case NGenCore::SQL_PGSQL:
-						new Database_PgSQL(false, $id);
+						self::$instance = new Database_PgSQL(false, $id);
 						break;
-					case NGenCore::SQL_SQLITE:
+					/*case NGenCore::SQL_SQLITE:
 						new Database_SQLite(false, $id);
-						break;
+						break;*/
 				}
 			}
 			

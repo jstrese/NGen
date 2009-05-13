@@ -14,6 +14,7 @@
 	<h1><a href="#">NGen&nbsp;&raquo;&nbsp;Creativity at mind</a></h1>
 	<p>Current Version: 0.1a</p>
 </div>
+
 <div id="menu">
 	<ul>
 		<li class="current_page_item"><a href="#">Homepage</a></li>

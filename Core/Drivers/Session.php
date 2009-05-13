@@ -5,7 +5,7 @@
 		 * References this specific instance, once constructed
 		 * @static
 		 */
-		static public $instance = null;
+		static protected $instance = null;
 		
 		/**
 		 * Starts the session and verifies the owner of the session.
@@ -16,12 +16,12 @@
 	 		session_start();
 	 					
 			// Prevent false sessions
-			if(!isset($this->__user))
+			if(!isset($this->__identity))
 			{
 				// hash the IP address
-				$this->__user = md5($_SERVER['REMOTE_ADDR']);
+				$this->__identity = $_SERVER['REMOTE_ADDR'];
 			}
-			elseif($this->__user != md5($_SERVER['REMOTE_ADDR']))
+			elseif($this->__identity !== $_SERVER['REMOTE_ADDR'])
 			{
 				// Prevent the user from doing anything [E_FATAL]
 				trigger_error('NGen::Session -> Invalid session', E_USER_ERROR);
@@ -29,8 +29,6 @@
 			
 			// Prevention for session fixation
 			session_regenerate_id(true);
-			
-			self::$instance = &$this;
 		}
 	 	
 	 	/**
@@ -44,7 +42,7 @@
 	 	{	 		
 			if(self::$instance === null)
 			{
-				new self();
+				self::$instance = new self();
 			}
 			
 			return self::$instance;

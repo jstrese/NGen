@@ -14,8 +14,6 @@
 					$this->poolid = $poolid;
 					parent::$pool[$config['host'].':'.$config['base']] = &$this;
 				}
-				
-				parent::$instance = &$this;
 		}
 		
 		final public function __destruct()

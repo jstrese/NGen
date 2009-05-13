@@ -1,8 +1,8 @@
 <?php
-
 	class Page
 	{
-		static public $instance = null;
+		static protected $instance = null;
+		static private $errorRaised = false;
 		
 		final static public function getInstance()
 		{
@@ -15,11 +15,17 @@
 						return null;
 						break;
 					case NGenCore::PAGE_SMARTY:
-						self::$instance = Page_Smarty::getInstance();
+						self::$instance = new Page_Smarty(
+							NGenCore::$configs['__section'],
+							NGenCore::$configs['__action'],
+							NGenCore::$configs['cache'],
+							NGenCore::$configs['page_cache_lifetime'],
+							(bool)NGenCore::$configs['use_default_actions']
+						);
 						break;
-					case NGenCore::PAGE_XPOP:
+					/*case NGenCore::PAGE_XPOP:
 						self::$instance = Page_XPOP::getInstance();
-						break;
+						break;*/
 				}
 			}
 			
@@ -28,7 +34,7 @@
 		
 		final static public function getInstance2()
 		{
-			if(self::$instance === null)
+			if(!self::$errorRaised)
 			{
 				switch(NGenCore::$configs['page_driver'])
 				{
@@ -37,11 +43,11 @@
 						return null;
 						break;
 					case NGenCore::PAGE_SMARTY:
-						self::$instance = Page_Smarty::getInstance2();
+						self::$instance = new Page_Smarty('', '', 0, 0, false, true);
 						break;
-					case NGenCore::PAGE_XPOP:
+					/*case NGenCore::PAGE_XPOP:
 						self::$instance = Page_XPOP::getInstance2();
-						break;
+						break;*/
 				}
 			}
 			
@@ -65,5 +71,4 @@
 			exit;
 		}
 	}
-
 ?>

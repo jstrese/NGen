@@ -35,11 +35,6 @@
 		 */
 	 	private $use_default = true;
 		/**
-		 * Stored reference
-		 * @static
-		 */
-		static public $instance;
-		/**
 		 * Cache method: CACHE_DISABLED
 		 * No cache is used
 		 * @link http://www.smarty.net/manual/en/variable.caching.php
@@ -83,9 +78,6 @@
 			$this->caching = $cache;
 				
 			$this->caching_lifetime = $caching_lifetime;
-				
-			// Instance
-			self::$instance = &$this;
 		}
 				
 		/**
@@ -149,48 +141,6 @@
 			}
 		}
 				
-		/**
-		 * Returns the constructed page object
-		 * @example Page::getInstance()
-		 * @return Page_Smarty
-		 * @static
-		 */
-		static public function getInstance()
-		{
-			if(self::$instance === null)
-			{
-				new self(NGenCore::$configs['__section'], NGenCore::$configs['__action'], NGenCore::$configs['cache'], NGenCore::$configs['page_cache_lifetime'], (bool)NGenCore::$configs['use_default_actions']);
-			}
-			return self::$instance;
-		}
-		
-		/**
-		 * Returns a constructed Page object if one is not already constructed. This is used ONLY for Exception/Error handling!
-		 * @example Page::getInstance2()
-		 * @return Page_Smarty
-		 * @static
-		 */
-		static public function getInstance2()
-		{
-			if(self::$instance === null)
-			{
-				new self('', '', self::CACHE_DISABLED, 0, false, true);
-			}
-			return self::$instance;
-		}
-		
-		/**
-		 * Checks the integrity and length of a variable to ensure we are getting something
-		 * Prior to 2.1, we checked with isset() -and- empty(), will revert if this change
-		 * causes conflicts.
-		 * @return boolean
-		 * @deprecated
-		 */
-		private function isvalid($what)
-		{
-			return isset($what[0]);
-		}
-		
 		/**
 		 * If default actions are enabled (see: $use_default), we attempt to load the default
 		 * action. Once loaded, we check for two things: a function that executes on every
