@@ -14,7 +14,11 @@
 /**
 * This class does contain all necessary methods for the HTML cache on file system
 */
-class Smarty_Internal_CacheResource_File extends Smarty_Internal_PluginBase {
+class Smarty_Internal_CacheResource_File {
+    function __construct($smarty)
+    {
+        $this->smarty = $smarty;
+    } 
     /**
     * Returns the filepath of the cached template output
     * 
@@ -144,7 +148,7 @@ class Smarty_Internal_CacheResource_File extends Smarty_Internal_PluginBase {
     */
     private function buildCachedFilepath ($resource_name, $cache_id, $compile_id)
     {
-//        $_filepath = md5($resource_name); 
+        $_files = explode('|',$resource_name);
         $_filepath = (string)abs(crc32($resource_name));
         // if use_sub_dirs, break file into directories
         if ($this->smarty->use_sub_dirs) {
@@ -165,11 +169,11 @@ class Smarty_Internal_CacheResource_File extends Smarty_Internal_PluginBase {
             $_compile_id = '';
         } 
         $_cache_dir = $this->smarty->cache_dir;
-        if (substr($_cache_dir, -1) != DIRECTORY_SEPARATOR) {
+        if (strpos('/\\',substr($_cache_dir, -1)) === false) {
             $_cache_dir .= DIRECTORY_SEPARATOR;
         } 
 
-        return $_cache_dir . $_cache_id . $_compile_id . $_filepath . '.' . basename($resource_name) . $this->smarty->php_ext;
+        return $_cache_dir . $_cache_id . $_compile_id . $_filepath . '.' . basename($_files[0]) . $this->smarty->php_ext;
     } 
 } 
 

@@ -34,45 +34,47 @@ class Smarty_Internal_Compile_Internal_Smarty_Var extends Smarty_Internal_Compil
                 return 'time()';
 
             case 'get':
-                $compiled_ref = ($this->smarty->request_use_auto_globals) ? "\$_GET" : "\$GLOBALS['HTTP_GET_VARS']";
+                $compiled_ref = "\$_GET";
                 break;
 
             case 'post':
-                $compiled_ref = ($this->smarty->request_use_auto_globals) ? "\$_POST" : "\$GLOBALS['HTTP_POST_VARS']";
+                $compiled_ref = "\$_POST";
                 break;
 
             case 'cookies':
-                $compiled_ref = ($this->smarty->request_use_auto_globals) ? "\$_COOKIE" : "\$GLOBALS['HTTP_COOKIE_VARS']";
+                $compiled_ref = "\$_COOKIE";
                 break;
 
             case 'env':
-                $compiled_ref = ($this->smarty->request_use_auto_globals) ? "\$_ENV" : "\$GLOBALS['HTTP_ENV_VARS']";
+                $compiled_ref = "\$_ENV";
                 break;
 
             case 'server':
-                $compiled_ref = ($this->smarty->request_use_auto_globals) ? "\$_SERVER" : "\$GLOBALS['HTTP_SERVER_VARS']";
+                $compiled_ref = "\$_SERVER";
                 break;
 
             case 'session':
-                $compiled_ref = ($this->smarty->request_use_auto_globals) ? "\$_SESSION" : "\$GLOBALS['HTTP_SESSION_VARS']";
+                $compiled_ref = "\$_SESSION";
                 break;
 
             case 'request':
-                if ($this->smarty->request_use_auto_globals) {
-                    $compiled_ref = "\$_REQUEST";
-                    break;
-                } 
+                $compiled_ref = "\$_REQUEST";
+                break;
 
             case 'template':
-                $_template_name = $compiler->template->getTemplateFilepath();
+                $_template_name = basename($compiler->template->getTemplateFilepath());
                 return "'$_template_name'";
+
+            case 'current_dir':
+                $_template_dir_name = dirname($compiler->template->getTemplateFilepath());
+                return "'$_template_dir_name'";
 
             case 'version':
                 $_version = Smarty::$_version;
                 return "'$_version'";
 
             case 'const':
-                if ($this->smarty->security && !$this->smarty->security_policy->allow_constants) {
+                if ($compiler->smarty->security && !$compiler->smarty->security_policy->allow_constants) {
                     $compiler->trigger_template_error("(secure mode) constants not permitted");
                     break;
                 } 
@@ -87,11 +89,11 @@ class Smarty_Internal_Compile_Internal_Smarty_Var extends Smarty_Internal_Compil
                     return "''";
                 } 
             case 'ldelim':
-                $_ldelim = $this->smarty->left_delimiter;
+                $_ldelim = $compiler->smarty->left_delimiter;
                 return "'$_ldelim'";
 
             case 'rdelim':
-                $_rdelim = $this->smarty->right_delimiter;
+                $_rdelim = $compiler->smarty->right_delimiter;
                 return "'$_rdelim'";
 
             default:
@@ -99,10 +101,12 @@ class Smarty_Internal_Compile_Internal_Smarty_Var extends Smarty_Internal_Compil
                 break;
         } 
         if (isset($_index[1])) {
-            $compiled_ref = $compiled_ref . "[$_index[1]]";
+            array_shift($_index);
+            foreach ($_index as $_ind) {
+                $compiled_ref = $compiled_ref . "[$_ind]";
+            } 
         } 
         return $compiled_ref;
     } 
 } 
-
 ?>

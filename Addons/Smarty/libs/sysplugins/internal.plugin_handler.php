@@ -10,7 +10,11 @@
 /**
 * Smarty Internal Plugin Handler Class
 */
-class Smarty_Internal_Plugin_Handler extends Smarty_Internal_Base {
+class Smarty_Internal_Plugin_Handler {
+    function __construct($smarty)
+    {
+        $this->smarty = $smarty;
+    } 
     /**
     * Call a Smarty plugin
     * 
@@ -20,7 +24,7 @@ class Smarty_Internal_Plugin_Handler extends Smarty_Internal_Base {
     public function __call($name, $args)
     {
         if ($this->loadSmartyPlugin($name, $args[1])) {
-            // call plugin
+            // call plugin 
             return call_user_func_array($this->smarty->registered_plugins[$name][1], $args[0]);
         } else {
             // plugin not found
@@ -45,7 +49,7 @@ class Smarty_Internal_Plugin_Handler extends Smarty_Internal_Base {
                 $plugin = 'smarty_' . $plugin_type . '_' . $name;
                 if ($this->smarty->loadPlugin($plugin)) {
                     if (class_exists($plugin, false)) {
-                        $plugin = array($plugin, 'execute');
+                        $plugin = array(new $plugin, 'execute');
                     } 
                     if (is_callable($plugin)) {
                         $this->smarty->registered_plugins[$name] = array($plugin_type, $plugin, false);
