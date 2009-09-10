@@ -16,7 +16,7 @@
 		}
 		catch(Exception $e)
 		{
-			Page::getInstance2()->display_error($e);
+			echo $e->getMessage();
 		}
 	}
 	

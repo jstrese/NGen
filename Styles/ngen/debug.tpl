@@ -4,6 +4,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 	<title>Error Encountered</title>
+	{literal}
 	<style type="text/css" media="screen">
 		body {
 			font-family: Tahoma, Courier;
@@ -44,6 +45,7 @@
 			float: right;
 		}
 	</style>
+	{/literal}
 </head>
 <body>
 	<div id="errcontainer">
