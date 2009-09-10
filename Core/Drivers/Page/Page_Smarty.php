@@ -75,6 +75,9 @@
 			$this->compile_dir = COMPILE_DIR;
 			$this->config_dir = CONFIG_DIR;
 			$this->cache_dir = CACHE_DIR;
+			
+			// Smarty3
+			$this->auto_literal = true;
 
 			// Change default caching behavior
 			$this->caching = $cache;
