@@ -1,4 +1,6 @@
 <?php
+	define('SMARTY_EXCEPTION_HANDLER' ,0);
+
 	// Smarty
 	require_once('./Addons/Smarty/libs/Smarty.class.php');
 
@@ -6,7 +8,7 @@
 	define('COMPILE_DIR', TEMPLATE_DIR . 'compile/');
 	define('CONFIG_DIR', TEMPLATE_DIR . 'config/');
 	define('CACHE_DIR', TEMPLATE_DIR . 'cache/');
-
+	
 	// NGen
 	define('SECTION_DIR', './Sections/');
 	define('DEFAULT_SECTION', 'home');
@@ -53,7 +55,7 @@
 		 */
 		const CACHE_DYNAMIC = 2;
 				
-		public function __construct($section, $action, $cache = self::CACHE_DISABLED, $caching_lifetime = 86400, $use_default = true, $error = false)
+		public function __construct($section, $action, $cache = self::CACHE_DISABLED, $cache_lifetime = 86400, $use_default = true, $error = false)
 		{
 			if(!$error)
 			{
@@ -77,7 +79,7 @@
 			// Change default caching behavior
 			$this->caching = $cache;
 				
-			$this->caching_lifetime = $caching_lifetime;
+			$this->cache_lifetime = $cache_lifetime;
 		}
 				
 		/**
@@ -108,7 +110,7 @@
 					}
 					else
 					{
-						throw new Exception_NGen('The requested page could not be found. Additionally, the default page could not be found.');
+						throw new Exception('The requested page could not be found. Additionally, the default page could not be found.');
 					}					
 				}
 			}			
@@ -160,13 +162,19 @@
 				// Try to run DefaultAction::section_all() -- which affects all pages, in all sections
 				if(method_exists('DefaultAction', 'section_all'))
 				{
-					DefaultAction::section_all();
+					try
+					{
+						DefaultAction::section_all();
+					}catch(Exception $ex){ $this->display_error($ex); die(); }
 				}
 				
 				// Try to run section-specific default action (section_*)
 				if(method_exists('DefaultAction', 'section_'.$this->section))
 				{
+					try
+					{
 					call_user_func('DefaultAction::section_'.$this->section);
+					}catch(Exception $ex){ $this->display_error($ex); die(); }
 				}
 			}
 		}
@@ -184,13 +192,13 @@
 			}
 
 			// Variables for use in the page
-			$this->assign(array(
-				'section' => $this->section,
-				'action' => $this->action,
-				'base_url' => NGenCore::$configs['document_root'],
-				'site_title' => NGenCore::$configs['site_title'],
-				'page_desc' => ucwords(($this->actObj && isset(Action::$description)) ? (substr(Action::$description, -6) === '|more|' ? rtrim(Action::$description, '|more|').'- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:''): Action::$description) : '- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:''))
-			));
+			Page::$vars['section'] = $this->section;
+			Page::$vars['action'] = $this->action;
+			Page::$vars['base_url'] = NGenCore::$configs['document_root'];
+			Page::$vars['site_title'] = NGenCore::$configs['site_title'];
+			Page::$vars['page_desc'] = ($this->actObj && isset(Action::$description)) ? (substr(Action::$description, -6) === '|more|' ? rtrim(Action::$description, '|more|').'- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:''): Action::$description) : '- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:'');
+			
+			$this->assign(Page::$vars);
 
 			if($this->actObj)
 			{
@@ -201,7 +209,7 @@
 				
 				if(isset(Action::$lifetime))
 				{
-					$this->caching_lifetime = Action::$lifetime;
+					$this->cache_lifetime = Action::$lifetime;
 				}
 				
 				if(isset(Action::$cache_uid))
@@ -213,15 +221,18 @@
 				{
 					if(!$this->is_cached($this->tpl, $this->cache_id) && method_exists('Action', 'run'))
 					{
-						Action::run();
+						try
+						{
+							Action::run();
+						}catch(Exception $ex){ $this->display_error($ex); die(); }
 					}
 				}
 				else
 				{
-					if(method_exists('Action', 'run'))
+					try
 					{
 						Action::run();
-					}				
+					}catch(Exception $ex){ $this->display_error($ex); die(); }		
 				}
 				
 				if(!isset(Action::$silence) || Action::$silence !== true)
@@ -236,39 +247,29 @@
 		}
 		
 		/**
-		 * Used by the exception handler to raise visual exceptions
+		 * Clears the cache for a select template
 		 */
-		public function load_error(exception $exception, $type = 'general')
-		{
-			$this->caching = 0;
-			
-			$this->assign(array(
-				'type' => $type,
-				'code' => $exception->getCode(),
-				'line' => $exception->getLine(),
-				'file' => $exception->getFile(),
-				'message' => $exception->getMessage()
-			));
-			
-			$this->display('error.tpl');
-		}
+	 	public function clear_cache($section, $action, $cache_id = null, $compile_id = null, $expire_time = null)
+	 	{
+	 		parent::clear_cache($section.'.'.$action.'.tpl', $cache_id, $compile_id, $expire_time);
+	 	}
 		
 		/**
-		 * Used by the error handler to raise visual errors
+		 * Used by the exception handler to raise visual exceptions
 		 */
-		public function load_error2($errno, $errstr, $errfile, $errline, $type = 'general')
+		public function display_error(exception $exception)
 		{
 			$this->caching = 0;
 			
 			$this->assign(array(
-				'type' => $type,
-				'code' => $errno,
-				'line' => $errline,
-				'file' => $errfile,
-				'message' => $errstr
+				'section' => NGenCore::$configs['__section'],
+				'action' => NGenCore::$configs['__action'],
+				'errLine' => $exception->getLine(),
+				'errFile' => $exception->getFile(),
+				'errMsg' => $exception->getMessage()
 			));
 			
-			$this->display('error.tpl');
+			$this->display('debug.tpl');
 		}
 	}
 ?>

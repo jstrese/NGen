@@ -10,14 +10,21 @@
 		
 	function exception_handler($exception)
 	{
-		Page::getInstance2()->load_error($exception, isset($exception->type) ? $exception->type : 'general');
+		try
+		{
+			Page::getInstance2()->display_error($exception);
+		}
+		catch(Exception $e)
+		{
+			Page::getInstance2()->display_error($e);
+		}
 	}
 	
 	set_exception_handler('exception_handler');
 	
 	function error_handler($errno, $errstr, $errfile, $errline)
 	{
-		Page::getInstance2()->load_error2($errno, $errstr, $errfile, $errline);
+		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 	}
 	
 	require_once('./config.php');

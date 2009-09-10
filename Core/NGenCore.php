@@ -13,6 +13,7 @@
 		const SQL_MYSQL		= 1;
 		const SQL_PGSQL		= 2;
 		const SQL_SQLITE	= 3;
+		
 		/**
 		 * Available template systems [Smarty, XPOP]
 		 */

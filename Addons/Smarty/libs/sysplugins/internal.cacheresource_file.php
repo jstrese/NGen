@@ -62,7 +62,8 @@ class Smarty_Internal_CacheResource_File {
     {
         if (!$template->isEvaluated()) {
             if (!is_object($this->smarty->write_file_object)) {
-                $this->smarty->loadPlugin("Smarty_Internal_Write_File");
+                require_once(SMARTY_SYSPLUGINS_DIR . 'internal.write_file.php');
+                //$this->smarty->loadPlugin("Smarty_Internal_Write_File");
                 $this->smarty->write_file_object = new Smarty_Internal_Write_File;
             } 
             return $this->smarty->write_file_object->writeFile($template->getCachedFilepath(), $template->rendered_content);
@@ -92,15 +93,15 @@ class Smarty_Internal_CacheResource_File {
     */
     public function clear($resource_name, $cache_id, $compile_id, $exp_time)
     {
-        $_dir_sep = $this->smarty->use_sub_dirs ? DIRECTORY_SEPARATOR : '^';
+        $_dir_sep = $this->smarty->use_sub_dirs ? DS : '^';
         if (isset($resource_name)) {
             $_resource_part = (string)abs(crc32($resource_name)) . '.' . $resource_name . $this->smarty->php_ext;
         } else {
             $_resource_part = null;
         } 
         $_dir = $this->smarty->cache_dir;
-        if (substr($_dir, -1) != DIRECTORY_SEPARATOR) {
-            $_dir .= DIRECTORY_SEPARATOR;
+        if (strpos('/\\',substr($_dir, -1)) === false) {
+            $_dir .= DS;
         } 
         if ($this->smarty->use_sub_dirs && isset($cache_id)) {
             $_dir .= str_replace('|', $_dir_sep, $cache_id) . $_dir_sep;
@@ -123,9 +124,10 @@ class Smarty_Internal_CacheResource_File {
                 if ($_parts_compile_pos < 0) {
                     $_parts_compile_pos = 0;
                 } 
-                if (substr_compare((string)$_file, $_dir, 0, strlen($_dir)) == 0 &&
+                if ((substr_compare((string)$_file, $_dir, 0, strlen($_dir)) == 0 &&
                         (!isset($resource_name) || $_parts[$_parts_count-1] == $_resource_part) &&
-                        (!isset($compile_id) || $_parts[$_parts_compile_pos] == $compile_id)) {
+                        (!isset($compile_id) || $_parts[$_parts_compile_pos] == $compile_id)) ||
+                        (isset($resource_name) && (string)$_file == $_dir . $_resource_part)) {
                     if (isset($exp_time)) {
                         if (time() - @filemtime($_file) >= $exp_time) {
                             $_count += unlink((string) $_file) ? 1 : 0;
@@ -152,12 +154,12 @@ class Smarty_Internal_CacheResource_File {
         $_filepath = (string)abs(crc32($resource_name));
         // if use_sub_dirs, break file into directories
         if ($this->smarty->use_sub_dirs) {
-            $_filepath = substr($_filepath, 0, 2) . DIRECTORY_SEPARATOR
-             . substr($_filepath, 2, 2) . DIRECTORY_SEPARATOR
-             . substr($_filepath, 4, 2) . DIRECTORY_SEPARATOR
+            $_filepath = substr($_filepath, 0, 2) . DS
+             . substr($_filepath, 2, 2) . DS
+             . substr($_filepath, 4, 2) . DS
              . $_filepath;
         } 
-        $_compile_dir_sep = $this->smarty->use_sub_dirs ? DIRECTORY_SEPARATOR : '^';
+        $_compile_dir_sep = $this->smarty->use_sub_dirs ? DS : '^';
         if (isset($cache_id)) {
             $_cache_id = str_replace('|', $_compile_dir_sep, $cache_id) . $_compile_dir_sep;
         } else {
@@ -170,7 +172,7 @@ class Smarty_Internal_CacheResource_File {
         } 
         $_cache_dir = $this->smarty->cache_dir;
         if (strpos('/\\',substr($_cache_dir, -1)) === false) {
-            $_cache_dir .= DIRECTORY_SEPARATOR;
+            $_cache_dir .= DS;
         } 
 
         return $_cache_dir . $_cache_id . $_compile_id . $_filepath . '.' . basename($_files[0]) . $this->smarty->php_ext;

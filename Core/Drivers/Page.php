@@ -3,6 +3,7 @@
 	{
 		static protected $instance = null;
 		static private $errorRaised = false;
+		static public $vars = array();
 		
 		final static public function getInstance()
 		{
