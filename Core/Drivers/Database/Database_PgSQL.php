@@ -20,9 +20,9 @@
 		{
 			$configs = NGenCore::$configs['db'][$this->poolid];
 			
-			if(isset(parent::$pool[$configs['db'][$this->poolid]['host'].':'.$configs['db'][$this->poolid]['base']]))
+			if(isset(parent::$pool[$configs['host'].':'.$configs['base']]))
 			{
-				unset(parent::$pool[$configs['db'][$this->poolid]['host'].':'.$configs['db'][$this->poolid]['base']]);
+				unset(parent::$pool[$configs['host'].':'.$configs['base']]);
 			}
 		}
 	}
