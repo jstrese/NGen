@@ -1,7 +1,7 @@
 <?php
 	error_reporting(E_ALL);
 	
-	ini_set('include_path', get_include_path() . PATH_SEPARATOR . './Core/' . PATH_SEPARATOR . './Core/Drivers/' . PATH_SEPARATOR . './Core/Exceptions/' . PATH_SEPARATOR . './Core/Interfaces/' . PATH_SEPARATOR . './Core/User Objects/' . PATH_SEPARATOR . './Core/Drivers/Page/' . PATH_SEPARATOR . './Core/Drivers/Database/');
+	ini_set('include_path', get_include_path() . PATH_SEPARATOR . './Core/' . PATH_SEPARATOR . './Core/Drivers/' . PATH_SEPARATOR . './Core/Interfaces/' . PATH_SEPARATOR . './Core/User Objects/' . PATH_SEPARATOR . './Core/Drivers/Page/' . PATH_SEPARATOR . './Core/Drivers/Database/');
 		
 	function __autoload($method)
 	{
