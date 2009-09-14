@@ -1,15 +1,34 @@
 <?php
 	class Page
 	{
+		/**
+		 * Withholds the current Page object
+		 * @staticvar
+		 * @protected
+		 */
 		static protected $instance = null;
-		static private $errorRaised = false;
+		/**
+		 * Contains variables that will be sent to the template
+		 * @since 2.1
+		 * @staticvar
+		 * @public
+		 */
 		static public $vars = array();
 		
+		/**
+		 * Retrieves the current Page object. If it isn't created, it is created.
+		 * @example Page::getInstance()->assign('foo', 'bar')
+		 * @public
+		 * @static
+		 * @final
+		 */
 		final static public function getInstance()
 		{
 			if(self::$instance === null)
 			{
-				switch(NGenCore::$configs['page_driver'])
+				$configs = NGenCore::$configs;
+				
+				switch($configs['page_driver'])
 				{
 					default:
 					case NGenCore::PAGE_NONE:
@@ -17,11 +36,11 @@
 						break;
 					case NGenCore::PAGE_SMARTY:
 						self::$instance = new Page_Smarty(
-							NGenCore::$configs['__section'],
-							NGenCore::$configs['__action'],
-							NGenCore::$configs['cache'],
-							NGenCore::$configs['page_cache_lifetime'],
-							(bool)NGenCore::$configs['use_default_actions']
+							$configs['__section'],
+							$configs['__action'],
+							$configs['cache'],
+							$configs['page_cache_lifetime'],
+							(bool)$configs['use_default_actions']
 						);
 						break;
 					/*case NGenCore::PAGE_XPOP:
@@ -33,23 +52,26 @@
 			return self::$instance;
 		}
 		
+		/**
+		 * Retrieves a Page object for the Exception handler.
+		 * @public
+		 * @static
+		 * @final
+		 */
 		final static public function getInstance2()
 		{
-			if(!self::$errorRaised)
+			switch(NGenCore::$configs['page_driver'])
 			{
-				switch(NGenCore::$configs['page_driver'])
-				{
-					default:
-					case NGenCore::PAGE_NONE:
-						return null;
-						break;
-					case NGenCore::PAGE_SMARTY:
-						self::$instance = new Page_Smarty('', '', 0, 0, false, true);
-						break;
-					/*case NGenCore::PAGE_XPOP:
-						self::$instance = Page_XPOP::getInstance2();
-						break;*/
-				}
+				default:
+				case NGenCore::PAGE_NONE:
+					return null;
+					break;
+				case NGenCore::PAGE_SMARTY:
+					self::$instance = new Page_Smarty('', '', 0, 0, false, true);
+					break;
+				/*case NGenCore::PAGE_XPOP:
+					self::$instance = Page_XPOP::getInstance2();
+					break;*/
 			}
 			
 			return self::$instance;

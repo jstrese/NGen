@@ -18,14 +18,14 @@
 	// How long the cache lasts
 	$configs['page_cache_lifetime'] = 86400;
 
-	// How are pages cached
+	// Page cache
 	//
 	// 	0 Disabled
 	//		No cache, whatsoever.
 	// 	1 Enabled
-	//		Every page is cached with the same time-interval
-	// 	2 Dynamic <SMARTY ONLY>
-	//		Each page has its own independant time-interval and cache status (enabled/disabled); both settings can be, meaning optionally, defined in module command files
+	//		Enabled, all pages use the same $cache_time as defined in config.php
+	// 	2 Enabled / Granular
+	//		Use the $cache_time that was set when the page was cached. Allows for different $cache_time's amongst pages.
 
 	$configs['cache'] = 2;
 

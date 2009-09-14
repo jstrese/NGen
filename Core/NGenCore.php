@@ -17,7 +17,7 @@
 		/**
 		 * Available template systems [Smarty, XPOP]
 		 */
-		const PAGE_NONE		= 0;
+		const PAGE_NONE		= 0;		// Not implemented
 		//const PAGE_XPOP		= 1;	// Experimental Page Operator; Generic -- not developed yet
 		const PAGE_SMARTY	= 2;
 	}

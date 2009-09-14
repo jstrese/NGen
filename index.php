@@ -33,10 +33,9 @@
 	
 	date_default_timezone_set($configs['timezone']);
 	
+	$configs['__section'] = isset($_REQUEST['s']) ? $_REQUEST['s'] : '';
+	$configs['__action'] = isset($_REQUEST['a']) ? $_REQUEST['a'] : '';
 	NGenCore::$configs = $configs;
-	
-	NGenCore::$configs['__section'] = isset($_REQUEST['s']) ? $_REQUEST['s'] : '';
-	NGenCore::$configs['__action'] = isset($_REQUEST['a']) ? $_REQUEST['a'] : '';
 	
 	Page::getInstance()->load();
 ?>

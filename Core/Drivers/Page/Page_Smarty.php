@@ -1,5 +1,5 @@
 <?php
-	define('SMARTY_EXCEPTION_HANDLER' ,0);
+	define('SMARTY_EXCEPTION_HANDLER', 0);
 
 	// Smarty
 	require_once('./Addons/Smarty/libs/Smarty.class.php');
@@ -87,6 +87,8 @@
 				
 		/**
 		 * Determines the route to the template file, and decides whether there's an action
+		 * @public
+		 * @since 2.0
 		 * @return Exception Returns with an exception if the default page AND requested page cannot be found
 		 * @return Null If successful, nothing is returned
 		 */
@@ -121,6 +123,8 @@
 		
 		/**
 		 * Checks whether or not the template file exists
+		 * @public
+		 * @since 2.0
 		 * @return bool On return true it also sets $tpl to the template file
 		 */
 		public function tplExists($section, $action)
@@ -135,6 +139,8 @@
 		
 		/**
 		 * Checks for a valid Action object. There does not need to be an Action; if it's not found then it's just not executed.
+		 * @public
+		 * @since 2.0
 		 * @return Null Does not return anything. However, if the action exists then $actObj gets set to true
 		 */
 		public function actionExists($section, $action)
@@ -185,9 +191,14 @@
 		/**
 		 * Performs the page action and displays the page [if not silenced]
 		 * @public
+		 * @since 2.0
+		 * @return Null Does not return anything.
 		 */
 		public function load()
 		{
+			$vars = Page::$vars;
+			$configs = NGenCore::$configs;
+			
 			// Attempts to run the default action (if enabled)
 			if($this->use_default)
 			{
@@ -195,13 +206,13 @@
 			}
 
 			// Variables for use in the page
-			Page::$vars['section'] = $this->section;
-			Page::$vars['action'] = $this->action;
-			Page::$vars['base_url'] = NGenCore::$configs['document_root'];
-			Page::$vars['site_title'] = NGenCore::$configs['site_title'];
-			Page::$vars['page_desc'] = ($this->actObj && isset(Action::$description)) ? (substr(Action::$description, -6) === '|more|' ? rtrim(Action::$description, '|more|').'- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:''): Action::$description) : '- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:'');
+			$vars['section'] = $this->section;
+			$vars['action'] = $this->action;
+			$vars['base_url'] = $configs['document_root'];
+			$vars['site_title'] = $configs['site_title'];
+			$vars['page_desc'] = ($this->actObj && isset(Action::$description)) ? (substr(Action::$description, -6) === '|more|' ? rtrim(Action::$description, '|more|').'- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:''): Action::$description) : '- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:'');
 			
-			$this->assign(Page::$vars);
+			$this->assign($vars);
 
 			if($this->actObj)
 			{
@@ -251,6 +262,9 @@
 		
 		/**
 		 * Clears the cache for a select template
+		 * @public
+		 * @since 2.1
+		 * @return Null Does not return anything.
 		 */
 	 	public function clear_cache($section, $action, $cache_id = null, $compile_id = null, $expire_time = null)
 	 	{
@@ -259,6 +273,9 @@
 		
 		/**
 		 * Used by the exception handler to raise visual exceptions
+		 * @public
+		 * @since 2.1
+		 * @return Null Does not return anything.
 		 */
 		public function display_error(exception $exception)
 		{

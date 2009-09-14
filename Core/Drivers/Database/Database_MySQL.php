@@ -18,9 +18,11 @@
 		
 		final public function __destruct()
 		{
-			if(isset(parent::$pool[NGenCore::$configs['db'][$this->poolid]['host'].':'.NGenCore::$configs['db'][$this->poolid]['base']]))
+			$configs = NGenCore::$configs['db'][$this->poolid];
+			
+			if(isset(parent::$pool[$configs['db'][$this->poolid]['host'].':'.$configs['db'][$this->poolid]['base']]))
 			{
-				unset(parent::$pool[NGenCore::$configs['db'][$this->poolid]['host'].':'.NGenCore::$configs['db'][$this->poolid]['base']]);
+				unset(parent::$pool[$configs['db'][$this->poolid]['host'].':'.$configs['db'][$this->poolid]['base']]);
 			}
 		}
 	}
