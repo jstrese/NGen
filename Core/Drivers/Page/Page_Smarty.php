@@ -251,12 +251,12 @@
 				
 				if(!isset(Action::$silence) || Action::$silence !== true)
 				{
-					$this->display($this->tpl, null, $this->cache_id);
+					$this->display($this->tpl, $this->cache_id);
 				}
 			}
 			else
 			{
-				$this->display($this->tpl, null, $this->cache_id);
+				$this->display($this->tpl, $this->cache_id);
 			}
 		}
 		
