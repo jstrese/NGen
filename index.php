@@ -40,8 +40,8 @@
 	
 	date_default_timezone_set($configs['timezone']);
 	
-	$configs['__section'] = isset($_REQUEST['s']) ? $_REQUEST['s'] : '';
-	$configs['__action'] = isset($_REQUEST['a']) ? $_REQUEST['a'] : '';
+	RequestHandler::HandleRequest();
+	
 	NGenCore::$configs = $configs;
 
 	Page::getInstance()->load();

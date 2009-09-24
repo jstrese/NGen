@@ -6,7 +6,7 @@
 <meta name="author" content="{#author#}" />
 <meta name="keywords" content="" />
 <meta name="description" content="" />
-<link href="assets/default/default.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{$base_url}Styles/default/style/default.css" rel="stylesheet" type="text/css" media="screen" />
 </head>
 <body>
 <!-- start header -->

@@ -1,18 +1,16 @@
 <?php
-	define('SMARTY_EXCEPTION_HANDLER', 0);
-
 	// Smarty
 	require_once('./Addons/Smarty/libs/Smarty.class.php');
 
+	define('SMARTY_EXCEPTION_HANDLER', 0);
 	define('TEMPLATE_DIR', './Styles/' . NGenCore::$configs['theme'] . '/');
 	define('COMPILE_DIR', TEMPLATE_DIR . 'compile/');
 	define('CONFIG_DIR', TEMPLATE_DIR . 'config/');
 	define('CACHE_DIR', TEMPLATE_DIR . 'cache/');
 	
-	// NGen
-	define('SECTION_DIR', './Sections/');
-	define('DEFAULT_SECTION', 'home');
-	define('DEFAULT_ACTION', 'main');
+	//
+	//TODO: Edit error handler!
+	//
 	
 	class Page_Smarty extends Smarty implements Interface_Page
 	{
@@ -21,11 +19,7 @@
 		 */
 		public $tpl = '';
 		/**
-		 * Section requested
-		 */
-		public $section = '';
-		/**
-		 * Action to perform (Section->Action)
+		 * Action file
 		 */
 		public $action = '';
 		/**
@@ -55,16 +49,14 @@
 		 */
 		const CACHE_DYNAMIC = 2;
 				
-		public function __construct($section, $action, $cache = self::CACHE_DISABLED, $cache_lifetime = 86400, $use_default = true, $error = false)
+		public function __construct($cache = self::CACHE_DISABLED, $cache_lifetime = 86400, $use_default = true, $error = false)
 		{
 			if(!$error)
 			{
-				// revert if conflicts occur
-				$this->section = isset($section[0]) ? strtolower($section) : DEFAULT_SECTION;
-				$this->action  = isset($action[0]) ? strtolower($action) : DEFAULT_ACTION;
-							
-				// Determine the route we will take (section, action)
-				$this->route();
+				$this->tpl = RequestHandler::GetTemplateName();
+				$this->action = RequestHandler::GetActionPath();
+				
+				$this->loadAction();
 			}
 			
 			// Initialize Smarty
@@ -85,72 +77,6 @@
 			$this->cache_lifetime = $cache_lifetime;
 		}
 				
-		/**
-		 * Determines the route to the template file, and decides whether there's an action
-		 * @public
-		 * @since 2.0
-		 * @return Exception Returns with an exception if the default page AND requested page cannot be found
-		 * @return Null If successful, nothing is returned
-		 */
-		public function route()
-		{
-			if($this->tplExists($this->section, $this->action))
-			{
-				$this->actionExists($this->section, $this->action);
-			}
-			else
-			{
-				if($this->tplExists($this->section, DEFAULT_ACTION))
-				{
-					$this->actionExists($this->section, DEFAULT_ACTION);
-					$this->action = DEFAULT_ACTION;
-				}
-				else
-				{
-					if($this->tplExists(DEFAULT_SECTION, DEFAULT_ACTION))
-					{
-						$this->actionExists(DEFAULT_SECTION, DEFAULT_ACTION);
-						$this->section = DEFAULT_SECTION;
-						$this->action  = DEFAULT_ACTION;
-					}
-					else
-					{
-						throw new Exception('The requested page could not be found. Additionally, the default page could not be found.');
-					}					
-				}
-			}			
-		}
-		
-		/**
-		 * Checks whether or not the template file exists
-		 * @public
-		 * @since 2.0
-		 * @return bool On return true it also sets $tpl to the template file
-		 */
-		public function tplExists($section, $action)
-		{
-			if(file_exists(TEMPLATE_DIR . $section . '.' . $action . '.tpl'))
-			{
-				$this->tpl = $section . '.' . $action . '.tpl';
-				return true;
-			}
-			return false;
-		}
-		
-		/**
-		 * Checks for a valid Action object. There does not need to be an Action; if it's not found then it's just not executed.
-		 * @public
-		 * @since 2.0
-		 * @return Null Does not return anything. However, if the action exists then $actObj gets set to true
-		 */
-		public function actionExists($section, $action)
-		{
-			if(file_exists(SECTION_DIR . $section . '/' . $action . '.php'))
-			{
-				require_once(SECTION_DIR . $section . '/' . $action . '.php');
-				$this->actObj = true;
-			}
-		}
 				
 		/**
 		 * If default actions are enabled (see: $use_default), we attempt to load the default
@@ -164,9 +90,9 @@
 		 */
 		private function defaultAction()
 		{
-			if(file_exists(SECTION_DIR . '.default/' . DEFAULT_ACTION . '.php'))
+			if(file_exists(RequestHandler::SECTION_DIR . RequestHandler::DEFAULT_ACTION . '.php'))
 			{
-				require_once(SECTION_DIR . '.default/' . DEFAULT_ACTION . '.php');
+				require_once(RequestHandler::SECTION_DIR . RequestHandler::DEFAULT_ACTION . '.php');
 				
 				// Try to run DefaultAction::section_all() -- which affects all pages, in all sections
 				if(method_exists('DefaultAction', 'section_all'))
@@ -178,14 +104,30 @@
 				}
 				
 				// Try to run section-specific default action (section_*)
-				if(method_exists('DefaultAction', 'section_'.$this->section))
+				$section = RequestHandler::$requestParts;
+				// shove the action element off the array
+				array_pop($section);
+				$section = implode('_', $section);
+				
+				if(method_exists('DefaultAction', 'section_'.$section))
 				{
 					try
 					{
-					call_user_func('DefaultAction::section_'.$this->section);
+						call_user_func('DefaultAction::section_'.$section);
 					}catch(Exception $ex){ $this->display_error($ex); die(); }
 				}
 			}
+		}
+		
+		private function loadAction()
+		{
+			// This file already exists, it was checked by the RequestHandler
+			include_once($this->action);
+			
+			// The reason we check is because, for static files, it's logical
+			// to just have a blank action file. If it's blank, then there
+			// won't be an Action class, else there will be.
+			$this->actObj = class_exists('Action', false);
 		}
 														
 		/**
@@ -198,7 +140,7 @@
 		{
 			$vars = Page::$vars;
 			$configs = NGenCore::$configs;
-			
+						
 			// Attempts to run the default action (if enabled)
 			if($this->use_default)
 			{
@@ -206,11 +148,10 @@
 			}
 
 			// Variables for use in the page
-			$vars['section'] = $this->section;
-			$vars['action'] = $this->action;
 			$vars['base_url'] = $configs['document_root'];
+			$vars['style_url'] = TEMPLATE_DIR;
 			$vars['site_title'] = $configs['site_title'];
-			$vars['page_desc'] = ($this->actObj && isset(Action::$description)) ? (substr(Action::$description, -6) === '|more|' ? rtrim(Action::$description, '|more|').'- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:''): Action::$description) : '- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:'');
+			//$vars['page_desc'] = ($this->actObj && isset(Action::$description)) ? (substr(Action::$description, -6) === '|more|' ? rtrim(Action::$description, '|more|').'- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:''): Action::$description) : '- '.$this->section.($this->action !== DEFAULT_ACTION ? ' - '.$this->action:'');
 			
 			$this->assign($vars);
 
@@ -237,7 +178,7 @@
 					{
 						try
 						{
-							Action::run();
+							method_exists('Action', 'run') ? Action::run() : null;
 						}catch(Exception $ex){ $this->display_error($ex); die(); }
 					}
 				}
@@ -245,7 +186,7 @@
 				{
 					try
 					{
-						Action::run();
+						method_exists('Action', 'run') ? Action::run() : null;
 					}catch(Exception $ex){ $this->display_error($ex); die(); }		
 				}
 				
@@ -282,8 +223,8 @@
 			$this->caching = 0;
 			
 			$this->assign(array(
-				'section' => NGenCore::$configs['__section'],
-				'action' => NGenCore::$configs['__action'],
+				'section' => 'BLANK', // edit this
+				'action' => 'BLANK', // edit this
 				'errLine' => $exception->getLine(),
 				'errFile' => $exception->getFile(),
 				'errMsg' => $exception->getMessage()

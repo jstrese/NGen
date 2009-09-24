@@ -36,16 +36,11 @@
 						break;
 					case NGenCore::PAGE_SMARTY:
 						self::$instance = new Page_Smarty(
-							$configs['__section'],
-							$configs['__action'],
 							$configs['cache'],
 							$configs['page_cache_lifetime'],
 							(bool)$configs['use_default_actions']
 						);
 						break;
-					/*case NGenCore::PAGE_XPOP:
-						self::$instance = Page_XPOP::getInstance();
-						break;*/
 				}
 			}
 			
@@ -67,11 +62,8 @@
 					return null;
 					break;
 				case NGenCore::PAGE_SMARTY:
-					self::$instance = new Page_Smarty('', '', 0, 0, false, true);
+					self::$instance = new Page_Smarty(0, 0, false, true);
 					break;
-				/*case NGenCore::PAGE_XPOP:
-					self::$instance = Page_XPOP::getInstance2();
-					break;*/
 			}
 			
 			return self::$instance;
