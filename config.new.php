@@ -1,18 +1,18 @@
 <?php
 	// Title of the site
-	$configs['site_title'] = 'N-Gen';
+	$configs['site_title'] = 'My Site';
 
 	// Database settings
-	$configs['db'][0]['user'] = '';
-	$configs['db'][0]['pass'] = '';
-	$configs['db'][0]['host'] = '';
-	$configs['db'][0]['base'] = '';
+	// $configs['db'][0]['user'] = '';	// Database username
+	// $configs['db'][0]['pass'] = '';	// Database password
+	// $configs['db'][0]['host'] = '';	// Database hostname (normally 'localhost', can also be an IP address or domain name)
+	// $configs['db'][0]['base'] = '';	// Database name
 
 	// Database driver type [None, MySQL, SQLite] (all-capitalized)
-	$configs['db'][0]['driver'] = NGenCore::SQL_NONE;
+	// $configs['db'][0]['driver'] = NGenCore::SQL_NONE;	// Example: for MySQL use NGenCore::SQL_MYSQL
 
-	// Document root (path to this file)
-	$configs['document_root'] = '/NGen2.1/';
+	// Document root (path to this file) with trailing forward slash
+	$configs['document_root'] = '/example/site/';
 	// Page driver type [None, Smarty, XPOP]
 	$configs['page_driver'] = NGenCore::PAGE_SMARTY;
 	// How long the cache lasts
@@ -30,7 +30,7 @@
 	$configs['cache'] = 2;
 
 	// Name of the theme; /Styles/[theme]/
-	$configs['theme'] = 'ngen';
+	$configs['theme'] = 'default';
 
 	//
 	// Default actions can be very useful, however for demonstration

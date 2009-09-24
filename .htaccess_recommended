@@ -1,16 +1,6 @@
-#################################
-#            NGen 2.1           #
-#################################
-
 # Uncomment the line below to register
 # .rss as a valid extension
 # AddType application/rss+xml .rss
-
-# Disable directory listing
-IndexIgnore *
-
-# Follow symbolic links
-Options +FollowSymLinks
 
 # It's generally a good idea to set an
 # expire time.
@@ -19,13 +9,7 @@ Options +FollowSymLinks
 	ExpiresDefault "access plus 1 month"
 </IfModule>
 
-# Vital / Hidden / potentially personal file types
-<FilesMatch "\.(ini|htaccess|tpl|xml|phps)$">
-	order deny,allow
-	deny from all
-</FilesMatch>
-
-<Files config.php>
+<Files ~ "^(\.ht|config\.php)">
 	order deny,allow
 	deny from all
 </Files>
@@ -35,7 +19,7 @@ Options +FollowSymLinks
 	RewriteEngine on
 	
 	# Relative path to the site (starting at the document root)
-	RewriteBase /NGen2.1/
+	RewriteBase /example/site/
 	
 	# Set a couple conditions
 	RewriteCond %{REQUEST_FILENAME} !-f

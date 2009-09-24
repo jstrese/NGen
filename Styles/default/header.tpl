@@ -6,7 +6,7 @@
 <meta name="author" content="{#author#}" />
 <meta name="keywords" content="" />
 <meta name="description" content="" />
-<link href="assets/ngen/default.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="assets/default/default.css" rel="stylesheet" type="text/css" media="screen" />
 </head>
 <body>
 <!-- start header -->
