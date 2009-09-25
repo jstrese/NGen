@@ -8,7 +8,7 @@ Documentation can be found at the aforementioned website.
 Please note that it is still being written.
 
 -- ACKNOWLEDGEMENTS --
- 1) This software is distributed "as-is" with no gaurantee that
+ 1) This software is distributed "as-is" with no guarantee that
     it will work properly or at all.
  2) Developers and contributors of this software may not be
     held responsible for any harm or damage this software may
@@ -22,7 +22,7 @@ Please note that it is still being written.
 
 -- Installation --
  -- Before you start --
-  If you are unfamilar with the PHP syntax, "//" denotes
+  If you are unfamiliar with the PHP syntax, "//" denotes
   a commented line (along with "/* */" and "#" too). Lines
   prefixed with "//" are ignored. When told to "uncomment
   these lines" you are expected to remove the "//" prefix
@@ -52,21 +52,23 @@ Please note that it is still being written.
   config file is in /var/www/mysite/, the path would be
   "/mysite/".
 
- -- URL Rewriting --
-  To enable URL Rewriting in Apache, you will need the
-  mod_rewrite module. Additionally, you will need to
-  rename one of the two included .htaccess files to
+ -- Friendly URLs --
+  No software is used to render URLs as "friendly," however
+  our URLs instrinsically include "index.php" in front of
+  them (IE: index.php/my/page/here). This can either be left
+  alone, or you can strip the "index.php" part out with the
+  help of your web servers support for URL rewriting. Apache,
+  IIS, and NGINX support URL rewriting that would allow you to
+  do this.
+
+  This package is coupled with two .htaccess files for Apache,
+  use whichever one you find more suitable for your environment,
+  and please note that these are entirely optional and are meant
+  only for Apache.
   ".htaccess". The two included files are:
    - .htaccess_basic
-    - All this does is enable URL Rewriting
+    - Uses Apache's mod_rewrite module to strip out "index.php"
    - .htaccess_recommended
-    - This file enables URL Rewriting, protects
-      the config.php and .htaccess files. It
-      also attempts to enable the expires_module
-      to make your site more efficient. It also
-      contains a line, however it is commented out,
-      that, if uncommented, would enable the .rss
-      extension.
-
-  Summary: just rename one of the two included files
-  to ".htaccess".
+    - Has the same benefit as .htaccess_basic, but adds support
+      for mod_expires to make web pages load more efficiently.
+      It also disallows direct access to the config.php file.

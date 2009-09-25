@@ -41,7 +41,6 @@
 			$this->compile_dir  = $this->template_dir.'compile/';
 			$this->config_dir   = $this->template_dir.'config/';
 			$this->cache_dir    = $this->template_dir.'cache/';
-			$this->template_dir = array($this->template_dir);
 			
 			// Smarty3
 			$this->auto_literal = true;
