@@ -8,7 +8,7 @@
 		body {
 			font-family: Tahoma, Courier;
 			font-size: 12px;
-			background: url('image/system/shade.png') repeat-x #FFFFFF;
+			background: url('{$root_path}Images/system/shade.png') repeat-x #FFFFFF;
 		}
 		
 		#title {
@@ -28,8 +28,8 @@
 			border: 1px solid #FFFFFF;
 			border-left: 3px solid #FFFFFF;
 		}
-		
-		#errmsg {
+				
+		.errmsg {
 			padding: 0;
 			margin: 0;
 			background-color: #D2D2D2;
@@ -47,13 +47,23 @@
 </head>
 <body>
 	<div id="errcontainer">
-		<strong id="title">Critical Error!</strong><span id="location_text">/{$section}/{$action}</span>
+		<strong id="title">Critical Error!</strong><span id="location_text">{$request}</span>
 		<br />
 		<div id="errbox">
 			While attempting to display this page we encountered a critical error. Due to the nature of this error, we are unable to display this page. You should report this to the administrator of this site. Additionally, you may try <a href="#" onclick="window.location.reload()">reloading</a> this page.<br />
 			<br />
+			<strong>Request Details</strong><br />
+			<p class="errmsg" style="background-color: #FFFFD4;">
+				<strong>Raw:</strong><br />
+				&nbsp;&nbsp;{$request_raw}<br />
+				<strong>Qualified:</strong><br />
+				&nbsp;&nbsp;{$request_qualified}<br />
+				<strong>Variables:</strong><br />
+				&nbsp;&nbsp;{$request_vars}
+			</p>
+			<br />
 			<strong>Error Details</strong><br />
-			<p id="errmsg">
+			<p class="errmsg" style="background-color: #FFD4D4;">
 				<strong>File:</strong> {$errFile}<br />
 				<strong>Line:</strong> {$errLine}<br />
 				<strong>Details</strong><br />

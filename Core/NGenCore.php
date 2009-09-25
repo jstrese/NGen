@@ -15,10 +15,9 @@
 		const SQL_SQLITE	= 3;
 		
 		/**
-		 * Available template systems [Smarty, XPOP]
+		 * Available template systems
 		 */
 		const PAGE_NONE		= 0;		// Not implemented
-		//const PAGE_XPOP		= 1;	// Experimental Page Operator; Generic -- not developed yet
 		const PAGE_SMARTY	= 2;
 	}
 ?>

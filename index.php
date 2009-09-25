@@ -38,11 +38,11 @@
 	
 	set_error_handler('error_handler');
 	
-	date_default_timezone_set($configs['timezone']);
-	
-	RequestHandler::HandleRequest();
+	date_default_timezone_set($configs['timezone']);	
 	
 	NGenCore::$configs = $configs;
+	
+	RequestHandler::HandleRequest();
 
 	Page::getInstance()->load();
 ?>

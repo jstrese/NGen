@@ -2,11 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>{$site_title} {$page_desc}</title>
+<title>{$site_title} - {$page_desc}</title>
 <meta name="author" content="{#author#}" />
 <meta name="keywords" content="" />
 <meta name="description" content="" />
-<link href="{$base_url}Styles/default/style/default.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{$style_path}style/default.css" rel="stylesheet" type="text/css" media="screen" />
 </head>
 <body>
 <!-- start header -->
