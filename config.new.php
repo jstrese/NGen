@@ -13,8 +13,8 @@
 
 	// Document root (path to this file) with trailing forward slash
 	$configs['document_root'] = '/example/site/';
-	// Page driver type [None, Smarty, XPOP]
-	$configs['page_driver'] = NGenCore::PAGE_SMARTY;
+	// Page driver type [None, Smarty]
+	$configs['renderer_driver'] = NGenCore::RENDERER_SMARTY;
 	// How long the cache lasts
 	$configs['page_cache_lifetime'] = 86400;
 
@@ -23,9 +23,9 @@
 	// 	0 Disabled
 	//		No cache, whatsoever.
 	// 	1 Enabled
-	//		Enabled, all pages use the same $cache_time as defined in config.php
+	//		Enabled, all pages use the same $cache_lifetimes as defined in config.php
 	// 	2 Enabled / Granular
-	//		Use the $cache_time that was set when the page was cached. Allows for different $cache_time's amongst pages.
+	//		Use the $cache_lifetimes that was set when the page was cached. Allows for different $cache_lifetimes's amongst pages.
 
 	$configs['cache'] = 2;
 
@@ -33,12 +33,12 @@
 	$configs['theme'] = 'default';
 
 	//
-	// Default actions can be very useful, however for demonstration
-	// purposes, it is disabled by default. Default actions can be
-	// configured if this is true, see /Sections/.default/main.php
+	// OnLoad events can be very useful, however for demonstration
+	// purposes, it is disabled by default. OnLoad events can be
+	// configured if this is true, see /Controls/index.php
 	// for configuration.
 	//
-	$configs['use_default_actions'] = false;
+	$configs['use_onload'] = false;
 
 	// Default timezone
 	// Valid timezones: http://us2.php.net/manual/en/timezones.php

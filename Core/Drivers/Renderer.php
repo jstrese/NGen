@@ -1,5 +1,5 @@
 <?php
-	class Page
+	class Renderer
 	{
 		/**
 		 * Template file name
@@ -9,12 +9,12 @@
 		 */
 		static public $template_file = '';
 		/**
-		 * The path to the action file, decided by RequestHandler
+		 * The path to the control file, decided by RequestHandler
 		 * @since 2.1
 		 * @staticvar
 		 * @public
 		 */
-		static public $action_file   = '';
+		static public $control_file   = '';
 		/**
 		 * The directory of the current style/theme
 		 * (IE: ./Styles/default/)
@@ -24,15 +24,15 @@
 		 */
 		static public $style_dir   = '';
 		/**
-		 * Tells us whether or not we have an action object
+		 * Tells us whether or not we have a control object
 		 * to work with.
 		 * @staticvar
 		 * @public
 		 */
-		static public $use_action = false;
-		
+		static public $use_control = false;
+
 		/**
-		 * Withholds the current Page object
+		 * Withholds the current Renderer object
 		 * @staticvar
 		 * @protected
 		 */
@@ -44,7 +44,7 @@
 		 * @public
 		 */
 		static public $vars = array();
-				
+
 		/**
 		 * Retrieves the current Page object. If it isn't created, it is created.
 		 * @example Page::getInstance()->assign('foo', 'bar')
@@ -57,7 +57,7 @@
 			if(self::$instance === null)
 			{
 				$configs = NGenCore::$configs;
-				
+
 				//
 				// Populate our settings
 				//
@@ -65,25 +65,25 @@
 				{
 					self::preload();
 				}
-				
-				switch($configs['page_driver'])
+
+				switch($configs['renderer_driver'])
 				{
 					default:
-					case NGenCore::PAGE_NONE:
+					case NGenCore::RENDERER_NONE:
 						return null;
 						break;
-					case NGenCore::PAGE_SMARTY:
-						self::$instance = new Page_Smarty(
+					case NGenCore::RENDERER_SMARTY:
+						self::$instance = new Renderer_Smarty(
 							$configs['cache'],
 							$configs['page_cache_lifetime']
 						);
 						break;
 				}
 			}
-			
+
 			return self::$instance;
 		}
-		
+
 		/**
 		 * Retrieves a Page object for the Exception handler.
 		 * @public
@@ -99,97 +99,97 @@
 			{
 				self::preload();
 			}
-			
-			switch(NGenCore::$configs['page_driver'])
+
+			switch(NGenCore::$configs['renderer_driver'])
 			{
 				default:
-				case NGenCore::PAGE_NONE:
+				case NGenCore::RENDERER_NONE:
 					return null;
 					break;
-				case NGenCore::PAGE_SMARTY:
-					self::$instance = new Page_Smarty(0, 0, true);
+				case NGenCore::RENDERER_SMARTY:
+					self::$instance = new Renderer_Smarty(0, 0, true);
 					break;
 			}
-			
+
 			return self::$instance;
 		}
-		
+
 	 	/**
-		 * If default actions are enabled (see: $use_default), we attempt to load the default
-		 * action. Once loaded, we check for two things: a function that executes on every
-		 * page for every section (DefaultAction::section_all()), and a function for
-		 * section-specific usage (DefaultAction::section_<section>()). Both of these
-		 * functions are optional, and are only called if they exist.
+		 * If onloads are enabled (see: $use_onload), we attempt to load the onload.
+		 * Once loaded, we check for two things: a function that executes on every
+		 * page for every section (OnLoad::all()), and a function for section-specific
+		 * usage (OnLoad::<section>()). Both of these functions are optional, and are
+		 * only called if they exist.
 		 * @since 2.1
 		 * @static
 		 * @public
 		 * @return Null Does not return anything.
 		 */
-		static public function load_DefaultActions()
+		static public function OnLoad()
 		{
-			if(file_exists(RequestHandler::SECTION_DIR . RequestHandler::DEFAULT_ACTION . '.php'))
+			if(file_exists(RequestHandler::CONTROL_DIR . RequestHandler::DEFAULT_CONTROL . '.php'))
 			{
-				require_once(RequestHandler::SECTION_DIR . RequestHandler::DEFAULT_ACTION . '.php');
-				
+				require_once(RequestHandler::CONTROL_DIR . RequestHandler::DEFAULT_CONTROL . '.php');
+
 				// Make sure the file wasn't left blank
-				if(!class_exists('DefaultAction', false))
+				if(!class_exists('OnLoad', false))
 				{
 					return;
 				}
-				
+
 				// Try to run DefaultAction::section_all() -- which affects all pages, in all sections
-				if(method_exists('DefaultAction', 'section_all'))
+				if(method_exists('OnLoad', 'all'))
 				{
 					try
 					{
-						DefaultAction::section_all();
+						OnLoad::all();
 					}catch(Exception $ex){ self::getInstance2()->display_error($ex); die(); }
 				}
-				
+
 				// Try to run section-specific default action (section_*)
 				$section = RequestHandler::$requestParts;
 				// shove the action element off the array
 				array_pop($section);
 				$section = implode('_', $section);
-				
-				if(method_exists('DefaultAction', 'section_'.$section))
+
+				if(method_exists('OnLoad', $section))
 				{
 					try
 					{
-						call_user_func('DefaultAction::section_'.$section);
+						call_user_func('OnLoad::'.$section);
 					}catch(Exception $ex){ self::getInstance2()->display_error($ex); die(); }
 				}
 			}
 		}
-		
+
 		static private function preload()
 		{
-			self::$action_file   = RequestHandler::GetActionPath();
-			self::$template_file = RequestHandler::GetTemplateName();
-			self::$style_dir     = './Styles/'.NGenCore::$configs['theme'].'/';
+			self::$control_file   = RequestHandler::GetControlPath();
+			self::$template_file  = RequestHandler::GetTemplateName();
+			self::$style_dir      = './Styles/'.NGenCore::$configs['theme'].'/';
 		}
-		
+
 		/**
-		 * Includes the action file that RequestHandler came up with, then
-		 * checks to see whether the Action class is available. This allows
-		 * users to create blank action files for static pages with no need
-		 * for action files.
+		 * Includes the control file that RequestHandler came up with, then
+		 * checks to see whether the Control class is available. This allows
+		 * users to create blank control files for static pages with no need
+		 * for control files.
 		 * @since 2.1
 		 * @static
 		 * @public
 		 * @return Null Does not return anything.
 		 */
-		static public function load_Action()
+		static public function load_Control()
 		{
 			// This file already exists, it was checked by the RequestHandler
-			require_once(self::$action_file);
-			
+			require_once(self::$control_file);
+
 			// The reason we check is because, for static files, it's logical
-			// to just have a blank action file. If it's blank, then there
-			// won't be an Action class, else there will be.
-			self::$use_action = class_exists('Action', false);
+			// to just have a blank control file. If it's blank, then there
+			// won't be a Control class, else there will be.
+			self::$use_control = class_exists('Control', false);
 		}
-		
+
 		/**
 		 * Redirects the user
 		 * @example Page::redirect('home/index')
@@ -202,7 +202,7 @@
 			{
 				$location[0] = '';
 			}
-			
+
 			header('Location: ' . NGenCore::$configs['document_root'] . $location);
 			exit;
 		}

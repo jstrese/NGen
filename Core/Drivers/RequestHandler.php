@@ -19,23 +19,23 @@
 		 * @staticvar
 		 */
 		static public $variables    = array();
-		
+
 		/**
 		 * The section to default to
 		 * @since 2.1
 		 */
 		const DEFAULT_SECTION = 'home';
 		/**
-		 * The action to default to
+		 * The control to default to
 		 * @since 2.1
 		 */
-		const DEFAULT_ACTION  = 'index';
+		const DEFAULT_CONTROL  = 'index';
 		/**
-		 * The directory in which to search for sections and actions
+		 * The directory in which to search for sections and controls
 		 * @since 2.1
 		 */
-		const SECTION_DIR     = './Sections/';
-		
+		const CONTROL_DIR     = './Controllers/';
+
 		/**
 		 * Reads the data from PATH_INFO. If nothing useful is
 		 * found in PATH_INFO we result to ORIG_PATH_INFO, then
@@ -45,7 +45,7 @@
 		 * at all if both of these scenarios are true:
 		 *   - variables_order INI setting doesn't include S (server)
 		 *   - PHP is running under IIS
-		 * 
+		 *
 		 * Why? Since getenv() doesn't work on IIS and the
 		 * super global array $_SERVER isn't available, we
 		 * have no way of getting any info that we need.
@@ -71,12 +71,12 @@
 						self::SortRequest();
 						return;
 					}
-					
+
 					self::$request = $_SERVER['PATH_INFO'];
 					self::SortRequest();
 					return;
 				}
-				
+
 				if(isset($_SERVER['ORIG_PATH_INFO']))
 				{
 					if($_SERVER['ORIG_PATH_INFO'][0] !== '/')
@@ -90,11 +90,11 @@
 					self::SortRequest();
 					return;
 				}
-				
+
 				self::SortRequest();
 				return;
 			}
-			
+
 			//
 			// Attempt to use getenv() to find PATH_INFO
 			// This will fail on IIS, though I'm sure it
@@ -109,18 +109,18 @@
 					self::SortRequest();
 					return;
 				}
-				
+
 				self::$request = $request;
 				self::SortRequest();
 				return;
 			}
-			
+
 			self::SortRequest();
 			return;
 		}
-		
+
 		/**
-		 * Sorts out the action from the section, and isolates variables.
+		 * Sorts out the control from the section, and isolates variables.
 		 * This information is then stored.
 		 * @since 2.1
 		 * @static
@@ -134,45 +134,45 @@
 				$parts = explode('/', trim(strtolower(self::$request), '/'));
 				//
 				// If this section doesn't exist then we will treat the request
-				// as if they are supplying variables to the default section & action
+				// as if they are supplying variables to the default section & control
 				//
-				if(!is_dir(self::SECTION_DIR . $parts[0]))
+				if(!is_dir(self::CONTROL_DIR . $parts[0]))
 				{
-					self::$request = self::DEFAULT_SECTION.'/'.self::DEFAULT_ACTION.'/'.implode('/', $parts);
-					self::$requestParts = array(self::DEFAULT_SECTION, self::DEFAULT_ACTION);
+					self::$request = self::DEFAULT_SECTION.'/'.self::DEFAULT_CONTROL.'/'.implode('/', $parts);
+					self::$requestParts = array(self::DEFAULT_SECTION, self::DEFAULT_CONTROL);
 					self::$variables = $parts;
 					return;
 				}
-				
+
 				$path = $parts[0];
 				self::$requestParts[] = $parts[0];
 				unset($parts[0]);
-				
+
 				//
 				// A foreach loop cannot iterate through an empty array,
 				// now can it? This is used when only 1 part was sent.
-				// (IE: example.com/blog => example.com/blog/index) 
+				// (IE: example.com/blog => example.com/blog/index)
 				//
 				if(sizeof($parts) === 0)
 				{
-					if(is_file(self::SECTION_DIR.$path.'/'.self::DEFAULT_ACTION.'.php'))
+					if(is_file(self::CONTROL_DIR.$path.'/'.self::DEFAULT_CONTROL.'.php'))
 					{
-						self::$request .= '/'.self::DEFAULT_ACTION;
-						self::$requestParts[] = self::DEFAULT_ACTION;
+						self::$request .= '/'.self::DEFAULT_CONTROL;
+						self::$requestParts[] = self::DEFAULT_CONTROL;
 						return;
-					} 
+					}
 					else
 					{
-						throw new Exception('Could not find combination of sections and action.');
+						throw new Exception('Could not find combination of sections and control.');
 						return;
 					}
 				}
-								
+
 				foreach($parts as $key => $part)
 				{
 					$path .= '/';
 
-					if(is_dir(self::SECTION_DIR.$path.$part))
+					if(is_dir(self::CONTROL_DIR.$path.$part))
 					{
 						//
 						// If a directory exists with the last item in the array,
@@ -180,13 +180,13 @@
 						//
 						if($key === sizeof($parts))
 						{
-							if(is_file(self::SECTION_DIR.$path.$part.'/'.self::DEFAULT_ACTION.'.php'))
+							if(is_file(self::CONTROL_DIR.$path.$part.'/'.self::DEFAULT_CONTROL.'.php'))
 							{
 								self::$requestParts[] = $part;
-								self::$requestParts[] = self::DEFAULT_ACTION;
+								self::$requestParts[] = self::DEFAULT_CONTROL;
 								unset($parts[$key]);
 								self::$variables = array_merge($parts);
-								
+
 								return;
 							} // No suitable action found, throw error
 							else
@@ -194,51 +194,51 @@
 								throw new Exception('Could not find combination of sections and action.');
 							}
 						}
-						
+
 						$path .= $part;
 						self::$requestParts[] = $part;
 						unset($parts[$key]);
-						
+
 						continue;
 					}
-					
+
 					// Checking for action, since no dir is available
-					if(is_file(self::SECTION_DIR.$path.$part.'.php'))
+					if(is_file(self::CONTROL_DIR.$path.$part.'.php'))
 					{
 						self::$requestParts[] = $part;
 						unset($parts[$key]);
 						self::$variables = array_merge($parts);
-						
+
 						return;
-					} // Checking for default action
-					elseif(is_file(self::SECTION_DIR.$path.self::DEFAULT_ACTION.'.php'))
+					} // Checking for default control
+					elseif(is_file(self::CONTROL_DIR.$path.self::DEFAULT_CONTROL.'.php'))
 					{
-						self::$requestParts[] = self::DEFAULT_ACTION;
+						self::$requestParts[] = self::DEFAULT_CONTROL;
 						self::$variables = array_merge($parts);
-						
+
 						return;
-					} // No suitable action found, throw error
+					} // No suitable control found, throw error
 					else
 					{
-						throw new Exception('Could not find combination of sections and action.');
+						throw new Exception('Could not find combination of sections and control.');
 						return;
 					}
 				}
-				
+
 				return;
 			}
-			
+
 			//
 			// This is used when NOTHING is supplied
 			// (IE: example.com => example.com/home/index)
 			//
-			self::$request = self::DEFAULT_SECTION.'/'.self::DEFAULT_ACTION;
-			self::$requestParts = array(self::DEFAULT_SECTION, self::DEFAULT_ACTION);
+			self::$request = self::DEFAULT_SECTION.'/'.self::DEFAULT_CONTROL;
+			self::$requestParts = array(self::DEFAULT_SECTION, self::DEFAULT_CONTROL);
 		}
-		
+
 		/**
 		 * Forms a template name from the gathered combination
-		 * of sections and actions.
+		 * of sections and control.
 		 * @since 2.1
 		 * @param $ext The extension to append (default: .tpl)
 		 * @param $separator The separator to use when putting the parts together (default: .)
@@ -250,17 +250,17 @@
 		{
 			return implode($separator, self::$requestParts).$ext;
 		}
-		
+
 		/**
-		 * Forms a path to the action file that we need
+		 * Forms a path to the control file that we need
 		 * @since 2.1
 		 * @static
 		 * @public
-		 * @return string A string representing the path to the action file (IE: home/index.php)
+		 * @return string A string representing the path to the control file (IE: home/index.php)
 		 */
-		static public function GetActionPath()
+		static public function GetControlPath()
 		{
-			return self::SECTION_DIR.implode('/', self::$requestParts).'.php';
+			return self::CONTROL_DIR.implode('/', self::$requestParts).'.php';
 		}
 	}
 ?>

@@ -1,25 +1,25 @@
 <?php
 	error_reporting(E_ALL);
-	
+
 	if(PATH_SEPARATOR === ';')
 	{
-		ini_set('include_path', get_include_path() . ';./Core/;./Core/Drivers/;./Core/Interfaces/;./Core/User Objects/;./Core/Drivers/Page/;./Core/Drivers/Database/');
+		ini_set('include_path', get_include_path() . ';./Core/;./Core/Drivers/;./Core/Interfaces/;./Core/User Objects/;./Core/Drivers/Renderer/;./Core/Drivers/Database/');
 	}
 	else
 	{
-		ini_set('include_path', get_include_path() . ':./Core/:./Core/Drivers/:./Core/Interfaces/:./Core/User Objects/:./Core/Drivers/Page/:./Core/Drivers/Database/');
+		ini_set('include_path', get_include_path() . ':./Core/:./Core/Drivers/:./Core/Interfaces/:./Core/User Objects/:./Core/Drivers/Renderer/:./Core/Drivers/Database/');
 	}
-		
-	function __autoload($method)
+
+	function __autoload($class)
 	{
-		require_once($method . '.php');
+		require_once($class . '.php');
 	}
 
 	function exception_handler($exception)
 	{
 		try
 		{
-			Page::getInstance2()->display_error($exception);
+			Renderer::getInstance2()->display_error($exception);
 		}
 		catch(Exception $e)
 		{
@@ -35,14 +35,14 @@
 	}
 
 	require_once('./config.php');
-	
+
 	set_error_handler('error_handler');
-	
-	date_default_timezone_set($configs['timezone']);	
-	
+
+	date_default_timezone_set($configs['timezone']);
+
 	NGenCore::$configs = $configs;
-	
+
 	RequestHandler::HandleRequest();
 
-	Page::getInstance()->load();
+	Renderer::getInstance()->render();
 ?>

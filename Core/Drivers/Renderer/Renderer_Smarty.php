@@ -1,9 +1,9 @@
 <?php
 	// Smarty
-	require_once('./Addons/Smarty/libs/Smarty.class.php');
+	require_once('./3rd Party/Smarty/libs/Smarty.class.php');
 	define('SMARTY_EXCEPTION_HANDLER', 0);
-			
-	class Page_Smarty extends Smarty implements Interface_Page
+
+	class Renderer_Smarty extends Smarty implements Interface_Renderer
 	{
 		/**
 		 * Cache method: CACHE_DISABLED
@@ -25,47 +25,46 @@
 		 * @link http://www.smarty.net/manual/en/variable.caching.php
 		 */
 		const CACHE_DYNAMIC = 2;
-				
+
 		public function __construct($cache = self::CACHE_DISABLED, $cache_lifetime = 86400, $error = false)
 		{
 			if(!$error)
-			{				
-				Page::load_Action();
+			{
+				Renderer::load_Control();
 			}
-			
+
 			// Initialize Smarty
 			parent::__construct();
-						
+
 			// Change the default template directories
-			$this->template_dir = Page::$style_dir;
+			$this->template_dir = Renderer::$style_dir;
 			$this->compile_dir  = $this->template_dir.'compile/';
 			$this->config_dir   = $this->template_dir.'config/';
 			$this->cache_dir    = $this->template_dir.'cache/';
-			
+
 			// Smarty3
 			$this->auto_literal = true;
 
 			// Change default caching behavior
-			$this->caching      = $cache;
-				
+			$this->caching        = $cache;
 			$this->cache_lifetime = $cache_lifetime;
 		}
-														
+
 		/**
-		 * Performs the page action and displays the page [if not silenced]
+		 * Performs the page control and displays the page [if not silenced]
 		 * @public
 		 * @since 2.0
 		 * @return Null Does not return anything.
 		 */
-		public function load()
+		public function render()
 		{
-			$vars    = Page::$vars;
+			$vars    = Renderer::$use_control ? array_merge(Renderer::$vars, Control::$vars) : Renderer::$vars;
 			$configs = NGenCore::$configs;
-						
-			// Attempts to run the default action (if enabled)
-			if($configs['use_default_actions'])
+
+			// Attempts to run the onload function (if enabled)
+			if($configs['use_onload'])
 			{
-				Page::load_DefaultActions();
+				Renderer::OnLoad();
 			}
 
 			// Variables for use in the page
@@ -73,33 +72,33 @@
 			$vars['style_path'] = $configs['document_root'].'Styles/'.$configs['theme'].'/';
 			$vars['site_title'] = $configs['site_title'];
 			$vars['page_desc']  = ucwords(implode(' &#187; ', RequestHandler::$requestParts));
-			
+
 			$this->assign($vars);
 
-			if(Page::$use_action)
+			if(Renderer::$use_control)
 			{
-				if(isset(Action::$caching))
+				if(isset(Control::$caching))
 				{
-					$this->caching = Action::$caching;
+					$this->caching = Control::$caching;
 				}
-				
-				if(isset(Action::$lifetime))
+
+				if(isset(Control::$cache_lifetime))
 				{
-					$this->cache_lifetime = Action::$lifetime;
+					$this->cache_lifetime = Control::$cache_lifetime;
 				}
-				
-				if(isset(Action::$cache_uid))
+
+				if(isset(Control::$cache_uid))
 				{
-					$this->cache_id = Action::$cache_uid;
+					$this->cache_id = Control::$cache_uid;
 				}
-				
+
 				if($this->caching)
 				{
-					if(!$this->is_cached(Page::$template_file, $this->cache_id) && method_exists('Action', 'run'))
+					if(!$this->is_cached(Renderer::$template_file, $this->cache_id) && method_exists('Control', 'execute'))
 					{
 						try
 						{
-							method_exists('Action', 'run') ? Action::run() : null;
+							method_exists('Control', 'execute') ? Control::execute() : null;
 						}catch(Exception $ex){ $this->display_error($ex); die(); }
 					}
 				}
@@ -107,21 +106,21 @@
 				{
 					try
 					{
-						method_exists('Action', 'run') ? Action::run() : null;
-					}catch(Exception $ex){ $this->display_error($ex); die(); }		
+						method_exists('Control', 'execute') ? Control::execute() : null;
+					}catch(Exception $ex){ $this->display_error($ex); die(); }
 				}
-				
-				if(!isset(Action::$silence) || Action::$silence !== true)
+
+				if(!isset(Control::$silence) || Control::$silence !== true)
 				{
-					$this->display(Page::$template_file, $this->cache_id);
+					$this->display(Renderer::$template_file, $this->cache_id);
 				}
 			}
 			else
 			{
-				$this->display($this->tpl, $this->cache_id);
+				$this->display(Renderer::$template_file, $this->cache_id);
 			}
 		}
-				
+
 		/**
 		 * Used by the exception handler to raise visual exceptions
 		 * @public
@@ -132,7 +131,7 @@
 		{
 			$this->caching = 0;
 			$request       = RequestHandler::$request;
-			
+
 			$this->assign(array(
 				'request' => isset($request[49]) ? substr($request, 0, 50).' ...' : $request,
 				'request_raw' => $request,
@@ -142,7 +141,7 @@
 				'errFile' => $exception->getFile(),
 				'errMsg' => $exception->getMessage()
 			));
-			
+
 			$this->display('debug.tpl');
 		}
 	}

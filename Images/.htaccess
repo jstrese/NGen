@@ -1,5 +1,0 @@
-IndexIgnore *
-<FilesMatch "\.(ini|htaccess|tpl|xml|php)$">
-	order deny,allow
-	deny from all
-</FilesMatch>

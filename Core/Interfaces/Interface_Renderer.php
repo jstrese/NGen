@@ -1,7 +1,7 @@
 <?php
-	interface Interface_Page
+	interface Interface_Renderer
 	{
 		public function __construct($cache = self::CACHE_DISABLED, $cache_lifetime = 86400, $error = false);
-		public function load();
+		public function render();
 	}
 ?>
