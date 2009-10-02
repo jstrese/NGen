@@ -3,27 +3,37 @@
 
 	//
 	// NOTES
-	//   Rumor has it that DOCUMENT_ROOT isn't always
-	//   viable. However, we still use it because we
-	//	 find it viable for our userbase. If any troubles
-	//   arise, we can revert this to:
-	//     realpath(dirname(__FILE__))
+	//   - Apache's document root is the realpath.
+	//   - Nginx's document root is not a realpath,
+	//     checks are in place to counter this.
 	//
-	//   -- although we would like to stay away from realpath()
-	//   -- since it's an expensive call. DOCUMENT_ROOT should
-	//   -- already be realpath'd to our knowledge.
+	//   realpath()'s performance differs from setup to
+	//   setup. That said, we chose the lesser of two
+	//   evils and decided to use the document_root
+	//   whenever possible.
 	//
+	//   The current method excels by a fairly large
+	//   margin on servers where realpath() is expensive.
+	//   However, this method is MARGINALLY slower on
+	//   setups where realpath() is viable (~5% margin).
 	if(!defined('APP_PATH'))
 	{
-		if(isset($_SERVER['DOCUMENT_ROOT']))
-		{
-			define('APP_PATH', $_SERVER['DOCUMENT_ROOT'] . str_replace(array('\\', $_SERVER['DOCUMENT_ROOT']), array('/', ''), dirname(__FILE__)).'/');
-		}
-		else
-		{
-			$env = getenv('DOCUMENT_ROOT');
-			define('APP_PATH', $env . str_replace(array('\\', $env), array('/', ''), dirname(__FILE__)).'/');
-		}
+		$dir = str_replace('\\', '/', dirname(__FILE__));
+ 		$doc_root = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : getenv('DOCUMENT_ROOT');
+ 		//
+ 		// If the document root is not found within the
+ 		// directory path, then the server is sending
+ 		// a non-realpath path as the document root.
+ 		// This can be observed when using Nginx.
+ 		//
+	 	if(strstr($dir, $doc_root))
+	 	{
+			define('APP_PATH', $doc_root.str_replace($doc_root, '', $dir).'/');
+	 	}
+	 	else
+	 	{
+	 		define('APP_PATH', realpath(dirname(__FILE__)).'/');
+	 	}
 	}
 
 	require_once(APP_PATH.'Core/NGen.php');
