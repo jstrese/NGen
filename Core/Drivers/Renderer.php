@@ -56,7 +56,7 @@
 		{
 			if(self::$instance === null)
 			{
-				$configs = NGenCore::$configs;
+				$configs = NGen::$configs;
 
 				//
 				// Populate our settings
@@ -69,10 +69,10 @@
 				switch($configs['renderer_driver'])
 				{
 					default:
-					case NGenCore::RENDERER_NONE:
+					case NGen::RENDERER_NONE:
 						return null;
 						break;
-					case NGenCore::RENDERER_SMARTY:
+					case NGen::RENDERER_SMARTY:
 						self::$instance = new Renderer_Smarty(
 							$configs['cache'],
 							$configs['page_cache_lifetime']
@@ -100,13 +100,13 @@
 				self::preload();
 			}
 
-			switch(NGenCore::$configs['renderer_driver'])
+			switch(NGen::$configs['renderer_driver'])
 			{
 				default:
-				case NGenCore::RENDERER_NONE:
+				case NGen::RENDERER_NONE:
 					return null;
 					break;
-				case NGenCore::RENDERER_SMARTY:
+				case NGen::RENDERER_SMARTY:
 					self::$instance = new Renderer_Smarty(0, 0, true);
 					break;
 			}
@@ -127,9 +127,9 @@
 		 */
 		static public function OnLoad()
 		{
-			if(file_exists(RequestHandler::CONTROL_DIR . RequestHandler::DEFAULT_CONTROL . '.php'))
+			if(file_exists(RequestHandler::$control_dir . RequestHandler::DEFAULT_CONTROL . '.php'))
 			{
-				require_once(RequestHandler::CONTROL_DIR . RequestHandler::DEFAULT_CONTROL . '.php');
+				require_once(RequestHandler::$control_dir . RequestHandler::DEFAULT_CONTROL . '.php');
 
 				// Make sure the file wasn't left blank
 				if(!class_exists('OnLoad', false))
@@ -166,7 +166,7 @@
 		{
 			self::$control_file   = RequestHandler::GetControlPath();
 			self::$template_file  = RequestHandler::GetTemplateName();
-			self::$style_dir      = './Styles/'.NGenCore::$configs['theme'].'/';
+			self::$style_dir      = APP_PATH . 'Styles/'.NGen::$configs['theme'].'/';
 		}
 
 		/**
@@ -203,7 +203,7 @@
 				$location[0] = '';
 			}
 
-			header('Location: ' . NGenCore::$configs['document_root'] . $location);
+			header('Location: ' . NGen::$configs['document_root'] . $location);
 			exit;
 		}
 	}

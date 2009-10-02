@@ -1,19 +1,35 @@
 <?php
 	error_reporting(E_ALL);
 
-	if(PATH_SEPARATOR === ';')
+	//
+	// NOTES
+	//   Rumor has it that DOCUMENT_ROOT isn't always
+	//   viable. However, we still use it because we
+	//	 find it viable for our userbase. If any troubles
+	//   arise, we can revert this to:
+	//     realpath(dirname(__FILE__))
+	//
+	//   -- although we would like to stay away from realpath()
+	//   -- since it's an expensive call. DOCUMENT_ROOT should
+	//   -- already be realpath'd to our knowledge.
+	//
+	if(!defined('APP_PATH'))
 	{
-		ini_set('include_path', get_include_path() . ';./Core/;./Core/Drivers/;./Core/Interfaces/;./Core/User Objects/;./Core/Drivers/Renderer/;./Core/Drivers/Database/');
-	}
-	else
-	{
-		ini_set('include_path', get_include_path() . ':./Core/:./Core/Drivers/:./Core/Interfaces/:./Core/User Objects/:./Core/Drivers/Renderer/:./Core/Drivers/Database/');
+		if(isset($_SERVER['DOCUMENT_ROOT']))
+		{
+			define('APP_PATH', $_SERVER['DOCUMENT_ROOT'] . str_replace(array('\\', $_SERVER['DOCUMENT_ROOT']), array('/', ''), dirname(__FILE__)).'/');
+		}
+		else
+		{
+			$env = getenv('DOCUMENT_ROOT');
+			define('APP_PATH', $env . str_replace(array('\\', $env), array('/', ''), dirname(__FILE__)).'/');
+		}
 	}
 
-	function __autoload($class)
-	{
-		require_once($class . '.php');
-	}
+	require_once(APP_PATH.'Core/NGen.php');
+	spl_autoload_register('NGen::__loader_drivers');
+	spl_autoload_register('NGen::__loader_interfaces');
+	spl_autoload_register('NGen::__loader_user_objects');
 
 	function exception_handler($exception)
 	{
@@ -34,13 +50,13 @@
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 	}
 
-	require_once('./config.php');
+	require_once(APP_PATH.'config.php');
 
 	set_error_handler('error_handler');
 
 	date_default_timezone_set($configs['timezone']);
 
-	NGenCore::$configs = $configs;
+	NGen::$configs = $configs;
 
 	RequestHandler::HandleRequest();
 

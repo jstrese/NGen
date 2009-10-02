@@ -22,11 +22,5 @@
 		// same page twice but with different/altered content
 		//
 		static public $cache_uid      = null;
-
-
-		//static public function render($view)
-		//{
-		//	Renderer::getInstance()->render($view.'.tpl');
-		//}
 	}
 ?>

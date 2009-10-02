@@ -9,12 +9,12 @@
 	// $configs['db'][0]['base'] = '';	// Database name
 
 	// Database driver type [None, MySQL, SQLite] (all-capitalized)
-	// $configs['db'][0]['driver'] = NGenCore::SQL_NONE;	// Example: for MySQL use NGenCore::SQL_MYSQL
+	// $configs['db'][0]['driver'] = NGen::SQL_NONE;	// Example: for MySQL use NGenCore::SQL_MYSQL
 
 	// Document root (path to this file) with trailing forward slash
 	$configs['document_root'] = '/example/site/';
 	// Page driver type [None, Smarty]
-	$configs['renderer_driver'] = NGenCore::RENDERER_SMARTY;
+	$configs['renderer_driver'] = NGen::RENDERER_SMARTY;
 	// How long the cache lasts
 	$configs['page_cache_lifetime'] = 86400;
 

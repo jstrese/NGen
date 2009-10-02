@@ -1,13 +1,13 @@
 <?php
 	class Session implements Interface_Session
-	{	
+	{
 		/**
 		 * References this specific instance, once constructed
 		 * @static
 		 * @protected
 		 */
 		static protected $instance = null;
-		
+
 		/**
 		 * Starts the session and verifies the owner of the session.
 		 */
@@ -15,7 +15,7 @@
 	 	{
 	 		// Start the session
 	 		session_start();
-	 					
+
 			// Prevent false sessions
 			if(!isset($this->__identity))
 			{
@@ -25,13 +25,13 @@
 			elseif($this->__identity !== $_SERVER['REMOTE_ADDR'])
 			{
 				// Prevent the user from doing anything [E_FATAL]
-				trigger_error('NGen::Session -> Invalid session', E_USER_ERROR);
+				throw new Exception('NGen::Session -> Invalid session');
 			}
-			
+
 			// Prevention for session fixation
 			session_regenerate_id(true);
 		}
-	 	
+
 	 	/**
 	 	 * Returns the constructed instance
 	 	 * @example $session = Driver_Session::getInstance()
@@ -40,15 +40,15 @@
 	 	 * @return Session Constructed session object
 	 	 */
 	 	static public function getInstance()
-	 	{	 		
+	 	{
 			if(self::$instance === null)
 			{
 				self::$instance = new self();
 			}
-			
+
 			return self::$instance;
 		}
-	 	
+
 	 	/**
 	 	 * Deletes information from a session (can be overloaded)
 	 	 * @example $session->del('foo', 'bar', 'baz')
@@ -61,7 +61,7 @@
 				unset($_SESSION[$key]);
 			}
 		}
-		
+
 		/**
 		 * Deletes all information from the session
 		 * @example $session->flush()
@@ -74,7 +74,7 @@
 				unset($_SESSION[$key]);
 			}
 		}
-		
+
 		/**
 		 * Magic method __get($var)
 		 * @example $session->foo
@@ -88,7 +88,7 @@
 				return $_SESSION[$key];
 			}
 		}
-		
+
 		/**
 		 * Magic method __set($var, $val); sets session information
 		 * @example $session->foo = 'baz'
@@ -98,7 +98,7 @@
 		{
 			$_SESSION[$key] = $value;
 		}
-		
+
 		/**
 		 * Magic method __isset($var)
 		 * @example isset($session->foo)
@@ -109,7 +109,7 @@
 		{
 			return isset($_SESSION[$key]);
 		}
-		
+
 		/**
 		 * Magic method __toString()
 		 * @example print $session
@@ -121,12 +121,12 @@
 			print_r($_SESSION);
 			return '';
 		}
-		
+
 		/**
 		 * Magic method __clone()
 		 * @example clone $session
 		 * @return array
-		 */								
+		 */
 		public function __clone()
 		{
 			return $_SESSION;

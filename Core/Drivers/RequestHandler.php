@@ -14,6 +14,11 @@
 		 */
 		static public $requestParts = array();
 		/**
+		 * The directory in which to search for sections and controls
+		 * @since 2.1
+		 */
+		static public $control_dir = 'Controllers/';
+		/**
 		 * Variables from the request (IE: array(0 => 1, 1 => 'Sample-Blog-Post'))
 		 * @since 2.1
 		 * @staticvar
@@ -30,11 +35,6 @@
 		 * @since 2.1
 		 */
 		const DEFAULT_CONTROL  = 'index';
-		/**
-		 * The directory in which to search for sections and controls
-		 * @since 2.1
-		 */
-		const CONTROL_DIR     = './Controllers/';
 
 		/**
 		 * Reads the data from PATH_INFO. If nothing useful is
@@ -56,6 +56,9 @@
 		 */
 		static public function HandleRequest()
 		{
+			// Turn the path into a full path
+			self::$control_dir = APP_PATH . self::$control_dir;
+
 			//
 			// Prevent unecessary calls to getenv(),
 			// since we don't need to call getenv() if
@@ -136,7 +139,7 @@
 				// If this section doesn't exist then we will treat the request
 				// as if they are supplying variables to the default section & control
 				//
-				if(!is_dir(self::CONTROL_DIR . $parts[0]))
+				if(!is_dir(self::$control_dir . $parts[0]))
 				{
 					self::$request = self::DEFAULT_SECTION.'/'.self::DEFAULT_CONTROL.'/'.implode('/', $parts);
 					self::$requestParts = array(self::DEFAULT_SECTION, self::DEFAULT_CONTROL);
@@ -155,7 +158,7 @@
 				//
 				if(sizeof($parts) === 0)
 				{
-					if(is_file(self::CONTROL_DIR.$path.'/'.self::DEFAULT_CONTROL.'.php'))
+					if(is_file(self::$control_dir.$path.'/'.self::DEFAULT_CONTROL.'.php'))
 					{
 						self::$request .= '/'.self::DEFAULT_CONTROL;
 						self::$requestParts[] = self::DEFAULT_CONTROL;
@@ -172,7 +175,7 @@
 				{
 					$path .= '/';
 
-					if(is_dir(self::CONTROL_DIR.$path.$part))
+					if(is_dir(self::$control_dir.$path.$part))
 					{
 						//
 						// If a directory exists with the last item in the array,
@@ -180,7 +183,7 @@
 						//
 						if($key === sizeof($parts))
 						{
-							if(is_file(self::CONTROL_DIR.$path.$part.'/'.self::DEFAULT_CONTROL.'.php'))
+							if(is_file(self::$control_dir.$path.$part.'/'.self::DEFAULT_CONTROL.'.php'))
 							{
 								self::$requestParts[] = $part;
 								self::$requestParts[] = self::DEFAULT_CONTROL;
@@ -203,7 +206,7 @@
 					}
 
 					// Checking for action, since no dir is available
-					if(is_file(self::CONTROL_DIR.$path.$part.'.php'))
+					if(is_file(self::$control_dir.$path.$part.'.php'))
 					{
 						self::$requestParts[] = $part;
 						unset($parts[$key]);
@@ -211,7 +214,7 @@
 
 						return;
 					} // Checking for default control
-					elseif(is_file(self::CONTROL_DIR.$path.self::DEFAULT_CONTROL.'.php'))
+					elseif(is_file(self::$control_dir.$path.self::DEFAULT_CONTROL.'.php'))
 					{
 						self::$requestParts[] = self::DEFAULT_CONTROL;
 						self::$variables = array_merge($parts);
@@ -260,7 +263,7 @@
 		 */
 		static public function GetControlPath()
 		{
-			return self::CONTROL_DIR.implode('/', self::$requestParts).'.php';
+			return self::$control_dir.implode('/', self::$requestParts).'.php';
 		}
 	}
 ?>

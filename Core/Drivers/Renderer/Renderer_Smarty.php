@@ -59,7 +59,7 @@
 		public function render()
 		{
 			$vars    = Renderer::$use_control ? array_merge(Renderer::$vars, Control::$vars) : Renderer::$vars;
-			$configs = NGenCore::$configs;
+			$configs = NGen::$configs;
 
 			// Attempts to run the onload function (if enabled)
 			if($configs['use_onload'])
