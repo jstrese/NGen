@@ -1,5 +1,5 @@
 <?php
-	class Database_PgSQL extends Database
+	class Database_PgSQL extends Database implements Interface_DBDriver
 	{
 		private $poolid = 0;
 

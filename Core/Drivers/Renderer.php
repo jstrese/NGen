@@ -191,6 +191,23 @@
 		}
 
 		/**
+		 * Formats traverse information for use in the title.
+		 * (IE: My Site - Traverse > Traverse2 >> Traverse 3)
+		 * @param $first_separator The first kind of separator to use
+		 * @param $separator The separator to show after the first element
+		 * @static
+		 * @public
+		 * @return string The formatted traverse text for a page title
+		 */
+		static public function getTitleTraverseText($first_separator = '&rsaquo;', $separator = '&#187;')
+		{
+			$request  = RequestHandler::$requestParts;
+			$traverse = $request[0].' '.$first_separator.' ';
+			unset($request[0]);
+			return $traverse.implode(' '.$separator.' ', $request);
+		}
+
+		/**
 		 * Redirects the user
 		 * @example Page::redirect('home/index')
 		 * @static

@@ -26,7 +26,7 @@
 		 */
 		const CACHE_DYNAMIC = 2;
 
-		public function __construct($cache = self::CACHE_DISABLED, $cache_lifetime = 86400, $error = false)
+		public function __construct($cache = false, $cache_lifetime = 86400, $error = false)
 		{
 			if(!$error)
 			{
@@ -46,14 +46,14 @@
 			$this->auto_literal = true;
 
 			// Change default caching behavior
-			$this->caching        = $cache;
+			$this->caching        = $cache ? self::CACHE_DYNAMIC : self::CACHE_DISABLED;
 			$this->cache_lifetime = $cache_lifetime;
 		}
 
 		/**
-		 * Performs the page control and displays the page [if not silenced]
+		 * Executes control and displays the page [if not silenced]
 		 * @public
-		 * @since 2.0
+		 * @since 2.1
 		 * @return Null Does not return anything.
 		 */
 		public function render()

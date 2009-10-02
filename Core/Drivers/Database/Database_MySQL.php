@@ -1,5 +1,5 @@
 <?php
-	class Database_MySQL extends Database
+	class Database_MySQL extends Database implements Interface_DBDriver
 	{
 		private $poolid = 0;
 

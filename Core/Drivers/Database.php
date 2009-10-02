@@ -77,10 +77,5 @@
 
 			return self::$pool[$conf['host'].':'.$conf['base']];
 		}
-
-		//TODO: Add toggle functionality
-		final static public function poolToggle()
-		{
-		}
 	}
 ?>

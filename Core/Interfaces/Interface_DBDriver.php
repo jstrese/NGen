@@ -2,6 +2,7 @@
 	interface Interface_DBDriver
 	{
 		public function __construct();
-		static public function load();
+		// Required to remove instance from instance pool
+		public function __destruct();
 	}
 ?>
