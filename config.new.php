@@ -27,6 +27,14 @@
 	$configs['renderer_driver'] = NGen::RENDERER_SMARTY;
 
 	//
+	// Session driver
+	// - The SESSION_GENERIC driver is the default secure
+	// - session driver. Other drivers may be added to allow
+	// - additional functionality and/or database access
+	//
+	$configs['session_driver'] = NGen::SESSION_GENERIC;
+
+	//
 	// Page cache
 	//  Set to 'true' to enable caching, 'false' to disable
 	// - Note: This can be individually configured for a per-page

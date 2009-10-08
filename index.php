@@ -16,6 +16,7 @@
 	//   margin on servers where realpath() is expensive.
 	//   However, this method is MARGINALLY slower on
 	//   setups where realpath() is viable (~5% margin).
+	//
 	if(!defined('APP_PATH'))
 	{
 		$dir = str_replace('\\', '/', dirname(__FILE__));
@@ -70,5 +71,8 @@
 
 	RequestHandler::HandleRequest();
 
-	Renderer::getInstance()->render();
+	if($renderer = Renderer::getInstance())
+	{
+		$renderer->render();
+	}
 ?>

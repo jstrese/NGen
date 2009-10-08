@@ -4,8 +4,8 @@
 		//
 		// $caching must be set to true for any caching to happen
 		//
-		// static public $caching = true;
-
+		static public $caching = false;
+		static public $silence = true;
 		//
 		//  $lifetime is the time (in seconds) the cache is good for
 		//
@@ -35,9 +35,9 @@
 		// just comment the function out, or remove it from the source file if
 		// you don't use it.
 		//
-		static public function execute()
+		public function execute()
 		{
-			// ...
+			echo 'Hello, World!';
 		}
 	}
 ?>

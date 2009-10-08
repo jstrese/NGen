@@ -8,19 +8,19 @@
 		body {
 			font-family: Tahoma, Courier;
 			font-size: 12px;
-			background: url('{$root_path}Images/system/shade.png') repeat-x #FFFFFF;
+			background: url('{$root_path}Styles/system_images/system/shade.png') repeat-x #FFFFFF;
 		}
-		
+
 		#title {
 			color: #D50000;
 			font-size: 20px;
 		}
-		
+
 		#errcontainer {
 			width: 600px;
 			margin: 0 auto;
 		}
-		
+
 		#errbox {
 			width: 100%;
 			padding: 5px;
@@ -28,14 +28,14 @@
 			border: 1px solid #FFFFFF;
 			border-left: 3px solid #FFFFFF;
 		}
-				
+
 		.errmsg {
 			padding: 0;
 			margin: 0;
 			background-color: #D2D2D2;
 			font-family: Courier;
 		}
-		
+
 		#location_text {
 			font-weight: bold;
 			color: #D50000;

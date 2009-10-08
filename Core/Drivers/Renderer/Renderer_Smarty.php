@@ -3,8 +3,8 @@
 	require_once('./3rd Party/Smarty/libs/Smarty.class.php');
 	define('SMARTY_EXCEPTION_HANDLER', 0);
 
-	class Renderer_Smarty extends Smarty implements Interface_Renderer
-	{
+    class Renderer_Smarty extends Smarty implements Interface_Renderer
+    {
 		/**
 		 * Cache method: CACHE_DISABLED
 		 * No cache is used
@@ -26,13 +26,10 @@
 		 */
 		const CACHE_DYNAMIC = 2;
 
+		private $control = null;
+
 		public function __construct($cache = false, $cache_lifetime = 86400, $error = false)
 		{
-			if(!$error)
-			{
-				Renderer::load_Control();
-			}
-
 			// Initialize Smarty
 			parent::__construct();
 
@@ -58,8 +55,15 @@
 		 */
 		public function render()
 		{
-			$vars    = Renderer::$use_control ? array_merge(Renderer::$vars, Control::$vars) : Renderer::$vars;
 			$configs = NGen::$configs;
+
+			// Variables for use in the page
+			// These are merged with the Control variables (control->vars)
+			$vars = array(
+				'root_path'  => $configs['document_root'],
+				'style_path' => $configs['document_root'].'Styles/'.$configs['theme'].'/',
+				'site_title' => $configs['site_title']
+			);
 
 			// Attempts to run the onload function (if enabled)
 			if($configs['use_onload'])
@@ -67,19 +71,11 @@
 				Renderer::OnLoad();
 			}
 
-			// Variables for use in the page
-			$vars['root_path']  = $configs['document_root'];
-			$vars['style_path'] = $configs['document_root'].'Styles/'.$configs['theme'].'/';
-			$vars['site_title'] = $configs['site_title'];
-			$vars['page_desc']  = ucwords(implode(' &#187; ', RequestHandler::$requestParts));
-
-			$this->assign($vars);
-
 			if(Renderer::$use_control)
 			{
 				if(isset(Control::$caching))
 				{
-					$this->caching = Control::$caching;
+					$this->caching = Control::$caching === true ? self::CACHE_DYNAMIC : self::CACHE_DISABLED;
 				}
 
 				if(isset(Control::$cache_lifetime))
@@ -94,11 +90,15 @@
 
 				if($this->caching)
 				{
-					if(!$this->is_cached(Renderer::$template_file, $this->cache_id) && method_exists('Control', 'execute'))
+					if(!$this->is_cached(Renderer::$template_file, $this->cache_id))
 					{
 						try
 						{
-							method_exists('Control', 'execute') ? Control::execute() : null;
+							$this->control = new Control();
+							if(method_exists($this->control, 'execute'))
+							{
+								$this->control->execute();
+							}
 						}catch(Exception $ex){ $this->display_error($ex); die(); }
 					}
 				}
@@ -106,19 +106,17 @@
 				{
 					try
 					{
-						method_exists('Control', 'execute') ? Control::execute() : null;
+						$this->control = new Control();
+						if(method_exists($this->control, 'execute'))
+						{
+							$this->control->execute();
+						}
 					}catch(Exception $ex){ $this->display_error($ex); die(); }
 				}
+			}
 
-				if(!isset(Control::$silence) || Control::$silence !== true)
-				{
-					$this->display(Renderer::$template_file, $this->cache_id);
-				}
-			}
-			else
-			{
-				$this->display(Renderer::$template_file, $this->cache_id);
-			}
+			$this->assign('view', new ArrayObject($this->control === null ? $vars : array_merge($this->control->vars, $vars), ArrayObject::ARRAY_AS_PROPS));
+			$this->display(Renderer::$template_file, $this->cache_id);
 		}
 
 		/**
@@ -139,7 +137,9 @@
 				'request_vars' => sizeof(RequestHandler::$variables) === 0 ? '(none)' : implode(', ', RequestHandler::$variables),
 				'errLine' => $exception->getLine(),
 				'errFile' => $exception->getFile(),
-				'errMsg' => $exception->getMessage()
+				'errMsg' => $exception->getMessage(),
+				'root_path'  => NGen::$configs['document_root'],
+				'style_path' => NGen::$configs['document_root'].'Styles/'.NGen::$configs['theme'].'/'
 			));
 
 			$this->display('debug.tpl');

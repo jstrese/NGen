@@ -37,23 +37,34 @@
 		 * @protected
 		 */
 		static protected $instance = null;
+
 		/**
-		 * Contains variables that will be sent to the template
-		 * @since 2.1
+		 * When set to true, getInstance() may not be called
+		 * (used for $silence'd Controls)
 		 * @staticvar
-		 * @public
+		 * @private
 		 */
-		static public $vars = array();
+		static private $blockFutureRequests = false;
 
 		/**
 		 * Retrieves the current Page object. If it isn't created, it is created.
-		 * @example Page::getInstance()->assign('foo', 'bar')
+		 * @example Renderer::getInstance()->assign('foo', 'bar')
 		 * @public
 		 * @static
 		 * @final
+		 * @return Renderer object
 		 */
 		final static public function getInstance()
 		{
+			//
+			// Prevent calls to Renderer:;getInstance() when executing
+			// a $silence'd Control.
+			//
+			if(self::$blockFutureRequests === true)
+			{
+				throw new Exception('Renderer::getInstance() cannot be called on a silent control.');
+			}
+
 			if(self::$instance === null)
 			{
 				$configs = NGen::$configs;
@@ -63,7 +74,13 @@
 				//
 				if(self::$template_file === '')
 				{
-					self::preload();
+					//
+					// preload() returns false if script was $silence'd
+					//
+					if(!self::preload())
+					{
+						return false;
+					}
 				}
 
 				switch($configs['renderer_driver'])
@@ -89,6 +106,7 @@
 		 * @public
 		 * @static
 		 * @final
+		 * @return Renderer object
 		 */
 		final static public function getInstance2()
 		{
@@ -97,7 +115,7 @@
 			//
 			if(self::$template_file === '')
 			{
-				self::preload();
+				self::preload(true);
 			}
 
 			switch(NGen::$configs['renderer_driver'])
@@ -112,6 +130,20 @@
 			}
 
 			return self::$instance;
+		}
+
+		/**
+		 * Returns whether the renderer is blocked or not.
+		 * The renderer gets blocked when a $silence'd control
+		 * gets executed.
+		 * @public
+		 * @static
+		 * @final
+		 * @return bool
+		 */
+		final static public function isBlocked()
+		{
+			return self::$blockFutureRequests;
 		}
 
 	 	/**
@@ -131,13 +163,17 @@
 			{
 				require_once(RequestHandler::$control_dir . RequestHandler::DEFAULT_CONTROL . '.php');
 
+				//
 				// Make sure the file wasn't left blank
+				//
 				if(!class_exists('OnLoad', false))
 				{
 					return;
 				}
 
+				//
 				// Try to run DefaultAction::section_all() -- which affects all pages, in all sections
+				//
 				if(method_exists('OnLoad', 'all'))
 				{
 					try
@@ -146,9 +182,13 @@
 					}catch(Exception $ex){ self::getInstance2()->display_error($ex); die(); }
 				}
 
+				//
 				// Try to run section-specific default action (section_*)
+				//
 				$section = RequestHandler::$requestParts;
+				//
 				// shove the action element off the array
+				//
 				array_pop($section);
 				$section = implode('_', $section);
 
@@ -162,11 +202,23 @@
 			}
 		}
 
-		static private function preload()
+		/**
+		 * Preloads path information (control file, template file, style dir)
+		 * and loads the control.
+		 * @param $errored True when an error has been raised, false otherwise
+		 * @static
+		 * @private
+		 */
+		static private function preload($errored = false)
 		{
 			self::$control_file   = RequestHandler::GetControlPath();
 			self::$template_file  = RequestHandler::GetTemplateName();
 			self::$style_dir      = APP_PATH . 'Styles/'.NGen::$configs['theme'].'/';
+
+			if($errored === false)
+			{
+				return self::load_Control();
+			}
 		}
 
 		/**
@@ -181,25 +233,56 @@
 		 */
 		static public function load_Control()
 		{
+			//
 			// This file already exists, it was checked by the RequestHandler
+			//
 			require_once(self::$control_file);
 
+			//
 			// The reason we check is because, for static files, it's logical
 			// to just have a blank control file. If it's blank, then there
 			// won't be a Control class, else there will be.
-			self::$use_control = class_exists('Control', false);
+			//
+			if(self::$use_control = class_exists('Control', false))
+			{
+				// If $silence is set to true inside the Control, then we
+				// don't need to display a page. This skips the rendering
+				// process (as it would be overhead).
+				if(isset(Control::$silence) && Control::$silence === true)
+				{
+					self::$blockFutureRequests = true;
+
+					if(NGen::$configs['use_onload'])
+					{
+						self::OnLoad();
+					}
+
+					try
+					{
+						$control = new Control();
+						if(method_exists($control, 'execute'))
+						{
+							$control->execute();
+						}
+					}catch(Exception $ex){ self::getInstance2()->display_error($ex); die(); }
+
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		/**
-		 * Formats traverse information for use in the title.
-		 * (IE: My Site - Traverse > Traverse2 >> Traverse 3)
+		 * Formats traverse information.
+		 * (IE: Traverse > Traverse 2 >> Traverse 3)
 		 * @param $first_separator The first kind of separator to use
 		 * @param $separator The separator to show after the first element
 		 * @static
 		 * @public
-		 * @return string The formatted traverse text for a page title
+		 * @return string The formatted traverse text
 		 */
-		static public function getTitleTraverseText($first_separator = '&rsaquo;', $separator = '&#187;')
+		static public function getTraverseText($first_separator = '&rsaquo;', $separator = '&#187;')
 		{
 			$request  = RequestHandler::$requestParts;
 			$traverse = $request[0].' '.$first_separator.' ';

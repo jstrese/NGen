@@ -9,18 +9,23 @@
 		static public $configs;
 
 		/**
-		 * Accepted types of database drivers [None, MySQL, SQLite]
+		 * Available session drivers
 		 */
-		const SQL_NONE		= 0;
-		const SQL_MYSQL		= 1;
-		const SQL_PGSQL		= 2;
-		const SQL_SQLITE	= 3;
+	 	const SESSION_GENERIC = 1;
+
+		/**
+		 * Accepted types of database drivers [None, MySQL, PgSQL]
+		 */
+		const SQL_NONE      = 0;
+		const SQL_MYSQL     = 1;
+		const SQL_PGSQL     = 2;
+		const SQL_SQLITE    = 3;
 
 		/**
 		 * Available template systems
 		 */
-		const RENDERER_NONE		= 0; // Not implemented
-		const RENDERER_SMARTY	= 2;
+		const RENDERER_NONE   = 0; // Not implemented
+		const RENDERER_SMARTY = 1;
 
 		/**
 		 * First in queue for spl_autoload, attempts to load a driver
