@@ -6,18 +6,8 @@
 		//
 		//public static function all()
 		//{
-			// This executes before every page render
+			// Applies to all pages
 		//}
-
-		public static function testbed_usercp()
-		{
-			$session = Session::getInstance();
-
-			if(!$session->authenticate() || !isset($session->logged) || $session->logged !== 1)
-			{
-				Renderer::redirect('testbed/login');
-			}
-		}
 
 		//
 		// The following function is an example of how to

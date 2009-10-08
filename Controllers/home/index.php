@@ -4,8 +4,7 @@
 		//
 		// $caching must be set to true for any caching to happen
 		//
-		static public $caching = false;
-		static public $silence = true;
+		// static public $caching = false;
 		//
 		//  $lifetime is the time (in seconds) the cache is good for
 		//
@@ -20,24 +19,19 @@
 		//
 		// This sets a description for the page -- to be displayed after the
 		// site title (IE: N-Gen - Creativity at mind; where "N-Gen" is the
-		// title and "Creativity at mind" is the description). By default the
-		// description is "[section] - [action]", however if the [action] is the
-		// default action, then it is not displayed. Additionally, if you want to
-		// append the default description to your description, you can include the
-		// ending tag "|more|" (note: this must be in lowercase, and must be the
-		// last characters of the description).
+		// title and "Creativity at mind" is the description).
 		//
-		static public $description = '- Creativity at mind |more|';
+		// static public $description = '- Creativity at mind';
 
 		//
-		// run() is actually optional now
+		// execute() is actually optional now
 		// This way you can provide cache information without running anything
 		// just comment the function out, or remove it from the source file if
 		// you don't use it.
 		//
-		public function execute()
-		{
-			echo 'Hello, World!';
-		}
+		//public function execute()
+		//{
+			// ...
+		//}
 	}
 ?>

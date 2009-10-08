@@ -4,7 +4,7 @@
 				<h2 class="title"><a href="#">Congratulations - NGen is working!</a></h2>
 				<p class="byline"><small>Posted on October 1st, 2008 by <a href="#">Free CSS Templates</a></small></p>
 				<div class="entry">
-				<p><strong><img src="{$view.style_path}style/img04.jpg" alt="" width="140" height="165" class="left" />Plain Office</strong> is a free, fully standards-compliant CSS template designed by <a href="http://www.freecsstemplates.org/">Free CSS Templates</a>. This free template is released under a <a href="http://creativecommons.org/licenses/by/2.5/">Creative Commons Attributions 2.5</a> license, so you're pretty much free to do whatever you want with it  (even use it commercially) provided you keep the links in the footer intact. Have fun with it :)</p>
+				<p><strong><img src="{$vars.style_path}style/img04.jpg" alt="" width="140" height="165" class="left" />Plain Office</strong> is a free, fully standards-compliant CSS template designed by <a href="http://www.freecsstemplates.org/">Free CSS Templates</a>. This free template is released under a <a href="http://creativecommons.org/licenses/by/2.5/">Creative Commons Attributions 2.5</a> license, so you're pretty much free to do whatever you want with it  (even use it commercially) provided you keep the links in the footer intact. Have fun with it :)</p>
 				<p>&nbsp;</p>
 				<p>This template is also available as a <a href="http://www.freewpthemes.net/preview/blogsmith/">WordPress theme</a> at <a href="http://www.freewpthemes.net/">Free WordPress Themes</a>. The photo on this template is from <a href="http://www.pdphoto.org/">PDPhoto.org</a>. </p>
 					</p>

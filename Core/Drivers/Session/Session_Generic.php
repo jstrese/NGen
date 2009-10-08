@@ -5,6 +5,11 @@
 		{
 			parent::__construct($_SESSION, ArrayObject::ARRAY_AS_PROPS);
 
+			if(Session::$use_auth_key === true && !isset($this->__authed_key))
+			{
+				$this->genAuthKey();
+			}
+
 			// This should prevent session fixation attacks
 		 	session_regenerate_id(true);
 		}
@@ -62,27 +67,34 @@
 				else
 				{
 					// The 'authkey' MUST be specified in the URL
-					if(!isset($_GET['authkey']))
+					if(!isset($_GET['authkey']) && getenv('authkey') === false)
 					{
 						return false;
 					}
+
+					$key = isset($_GET['authkey']) ? $_GET['authkey'] : getenv('authkey');
 
 					if($this->__authed_key_pad === true)
 					{
-						$auth_key    = substr($this->__authed_key, 0, 32);
-						$auth_expire = (int)substr($this->__authed_key, 32);
+						$auth_key    = substr($key, 0, 32);
+						$auth_expire = (int)substr($key, 32);
 					}
 					else
 					{
-						$auth_key    = substr($this->__authed_key, -32);
-						$auth_expire = (int)substr($this->__authed_key, 0, -32);
+						$auth_key    = substr($key, -32);
+						$auth_expire = (int)substr($key, 0, -32);
 					}
 
-					if($auth_key !== $this->__authed_key || (int)$auth_expire !== (int)$this->__authed_expire)
+					if($auth_key !== $this->__authed_key_sum || (int)$auth_expire !== (int)$this->__authed_key_expire)
 					{
 						return false;
 					}
-						// Do we need to renew the key?
+					else
+					{
+						echo 'matches: ', $_GET['authkey'], ' ; ', $auth_key, ' ; ', $this->__authed_key_sum;
+					}
+
+					// Do we need to renew the key?
 					if($auth_expire <= time())
 					{
 						$this->genAuthKey();

@@ -272,39 +272,5 @@
 
 			return true;
 		}
-
-		/**
-		 * Formats traverse information.
-		 * (IE: Traverse > Traverse 2 >> Traverse 3)
-		 * @param $first_separator The first kind of separator to use
-		 * @param $separator The separator to show after the first element
-		 * @static
-		 * @public
-		 * @return string The formatted traverse text
-		 */
-		static public function getTraverseText($first_separator = '&rsaquo;', $separator = '&#187;')
-		{
-			$request  = RequestHandler::$requestParts;
-			$traverse = $request[0].' '.$first_separator.' ';
-			unset($request[0]);
-			return $traverse.implode(' '.$separator.' ', $request);
-		}
-
-		/**
-		 * Redirects the user
-		 * @example Page::redirect('home/index')
-		 * @static
-		 * @final
-		 */
-		final static public function redirect($location)
-		{
-			if($location[0] === '/')
-			{
-				$location[0] = '';
-			}
-
-			header('Location: ' . NGen::$configs['document_root'] . $location);
-			exit;
-		}
 	}
 ?>

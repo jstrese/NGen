@@ -11,7 +11,10 @@
 				session_start();
 				register_shutdown_function('Session::destruct');
 
-				self::$use_auth_key = $use_auth_key;
+				if($use_auth_key)
+				{
+					self::$use_auth_key = $use_auth_key;
+				}
 
 				switch(NGen::$configs['session_driver'])
 				{
