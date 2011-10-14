@@ -5,4 +5,3 @@
 		// Required to remove instance from instance pool
 		public function __destruct();
 	}
-?>

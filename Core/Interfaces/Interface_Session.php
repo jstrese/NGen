@@ -9,4 +9,3 @@
 		public function __toString();
 		public function __clone();
 	}
-?>

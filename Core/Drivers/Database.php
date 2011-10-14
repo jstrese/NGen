@@ -78,4 +78,3 @@
 			return self::$pool[$conf['host'].':'.$conf['base']];
 		}
 	}
-?>

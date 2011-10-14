@@ -75,4 +75,3 @@
 	{
 		$renderer->render();
 	}
-?>

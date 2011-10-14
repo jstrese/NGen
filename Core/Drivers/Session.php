@@ -33,4 +33,3 @@
    			$_SESSION = self::$instance->convertToArray();
 		}
 	}
-?>

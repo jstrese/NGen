@@ -64,4 +64,3 @@
 	// Valid timezones: http://us2.php.net/manual/en/timezones.php
 	//
 	$configs['timezone'] = 'America/Chicago';
-?>

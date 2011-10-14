@@ -266,4 +266,3 @@
 			return self::$control_dir.implode('/', self::$requestParts).'.php';
 		}
 	}
-?>

@@ -115,13 +115,6 @@
 				}
 			}
 
-			//
-			// TODO: Make it so we can access getURL, getTraverseText from outside $this->control
-			//
-			// DO NOT LEAVE IT LIKE THIS vvvvvvv
-			//
-			// .. YOU ARE A FOOL FOR HACKING IT TOGETHER LIKE THIS, YOU WILL REGRET IT -.-!
-			//
 			$this->assign('view', $this->control);
 			$this->assign('vars', new ArrayObject($this->control === null ? $vars : array_merge($this->control->vars, $vars), ArrayObject::ARRAY_AS_PROPS));
 			$this->display(Renderer::$template_file, $this->cache_id);
@@ -153,4 +146,3 @@
 			$this->display('debug.tpl');
 		}
 	}
-?>

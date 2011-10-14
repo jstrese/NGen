@@ -84,7 +84,7 @@
 		{
 			if(strpos($userobj, '_'))
 			{
-				$file = APP_PATH.'Core/User Objects/'.str_replace('_', '/', $userobj).'.php';
+				$file = APP_PATH.'Core/UserObjects/'.str_replace('_', '/', $userobj).'.php';
 				if(is_file($file))
 				{
 					require_once($file);
@@ -92,7 +92,7 @@
 			}
 			else
 			{
-				$file = APP_PATH.'Core/User Objects/'.$userobj.'.php';
+				$file = APP_PATH.'Core/UserObjects/'.$userobj.'.php';
 				if(is_file($file))
 				{
 					require_once($file);
@@ -100,4 +100,3 @@
 			}
 		}
 	}
-?>

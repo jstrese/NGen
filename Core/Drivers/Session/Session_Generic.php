@@ -62,7 +62,6 @@
 				if(!isset($this->__authed_key))
 				{
 					$this->genAuthKey();
-					$skip_check = true;
 				}
 				else
 				{
@@ -89,7 +88,7 @@
 					{
 						return false;
 					}
-					else
+					else // this isn't pushed
 					{
 						echo 'matches: ', $_GET['authkey'], ' ; ', $auth_key, ' ; ', $this->__authed_key_sum;
 					}
@@ -124,4 +123,3 @@
 			return (array)$this;
 		}
 	}
-?>
