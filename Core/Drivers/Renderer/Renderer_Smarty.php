@@ -1,49 +1,27 @@
 <?php
 	// Smarty
-	require_once('./3rd Party/Smarty/libs/Smarty.class.php');
+	require_once(APP_PATH.'3rd Party/Smarty/libs/Smarty.class.php');
 	define('SMARTY_EXCEPTION_HANDLER', 0);
 
     class Renderer_Smarty extends Smarty implements Interface_Renderer
     {
-		/**
-		 * Cache method: CACHE_DISABLED
-		 * No cache is used
-		 * @link http://www.smarty.net/manual/en/variable.caching.php
-		 */
-		const CACHE_DISABLED = 0;
-		/**
-		 * Cache method: CACHE_ENABLED
-		 * Enabled page cache for ALL, regardless of if you want
-		 * them cached or not, pages with a 'global' lifetime
-		 * @link http://www.smarty.net/manual/en/variable.caching.php
-		 */
-		const CACHE_ENABLED = 1;
-		/**
-		 * Cache method: CACHE_DYNAMIC
-		 * Caching is page-dependant. The lifetime can be different
-		 * for each page, also caching can be disabling on a per-page basis.
-		 * @link http://www.smarty.net/manual/en/variable.caching.php
-		 */
-		const CACHE_DYNAMIC = 2;
-
 		private $control = null;
 
 		public function __construct($cache = false, $cache_lifetime = 86400, $error = false)
 		{
 			// Initialize Smarty
 			parent::__construct();
-
+            
 			// Change the default template directories
-			$this->template_dir = Renderer::$style_dir;
-			$this->compile_dir  = $this->template_dir.'compile/';
-			$this->config_dir   = $this->template_dir.'config/';
-			$this->cache_dir    = $this->template_dir.'cache/';
+            $this->setTemplateDir(Renderer::$style_dir)
+                 ->setCompileDir(Renderer::$style_dir.'compile')
+                 ->setConfigDir(Renderer::$style_dir.'config')
+                 ->setCacheDir(Renderer::$style_dir.'cache');
 
-			// Smarty3
+            // No setters/getters yet in Smarty 3.1.4 for the following
 			$this->auto_literal = true;
-
-			// Change default caching behavior
-			$this->caching        = $cache ? self::CACHE_DYNAMIC : self::CACHE_DISABLED;
+            $this->compile_check = Smarty::COMPILECHECK_CACHEMISS;
+			$this->caching        = $cache ? Smarty::CACHING_LIFETIME_SAVED : Smarty::CACHING_OFF;
 			$this->cache_lifetime = $cache_lifetime;
 		}
 
@@ -75,7 +53,7 @@
 			{
 				if(isset(Control::$caching))
 				{
-					$this->caching = Control::$caching === true ? self::CACHE_DYNAMIC : self::CACHE_DISABLED;
+					$this->caching = Control::$caching === true ? Smarty::CACHING_LIFETIME_SAVED : Smarty::CACHING_OFF;
 				}
 
 				if(isset(Control::$cache_lifetime))
@@ -115,9 +93,9 @@
 				}
 			}
 
-			$this->assign('view', $this->control);
-			$this->assign('vars', new ArrayObject($this->control === null ? $vars : array_merge($this->control->vars, $vars), ArrayObject::ARRAY_AS_PROPS));
-			$this->display(Renderer::$template_file, $this->cache_id);
+			$this->assign('view', $this->control)
+			     ->assign('vars', new ArrayObject($this->control === null ? $vars : array_merge($this->control->vars, $vars), ArrayObject::ARRAY_AS_PROPS))
+			     ->display(Renderer::$template_file, $this->cache_id);
 		}
 
 		/**

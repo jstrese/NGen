@@ -56,14 +56,7 @@
 
 	set_exception_handler('exception_handler');
 
-	function error_handler($errno, $errstr, $errfile, $errline)
-	{
-		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-	}
-
 	require_once(APP_PATH.'config.php');
-
-	set_error_handler('error_handler');
 
 	date_default_timezone_set($configs['timezone']);
 
