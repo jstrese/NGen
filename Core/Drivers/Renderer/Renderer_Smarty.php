@@ -1,31 +1,8 @@
 <?php
-	// Smarty
 	require_once('./3rd Party/Smarty/libs/Smarty.class.php');
-	define('SMARTY_EXCEPTION_HANDLER', 0);
 
     class Renderer_Smarty extends Smarty implements Interface_Renderer
     {
-		/**
-		 * Cache method: CACHE_DISABLED
-		 * No cache is used
-		 * @link http://www.smarty.net/manual/en/variable.caching.php
-		 */
-		const CACHE_DISABLED = 0;
-		/**
-		 * Cache method: CACHE_ENABLED
-		 * Enabled page cache for ALL, regardless of if you want
-		 * them cached or not, pages with a 'global' lifetime
-		 * @link http://www.smarty.net/manual/en/variable.caching.php
-		 */
-		const CACHE_ENABLED = 1;
-		/**
-		 * Cache method: CACHE_DYNAMIC
-		 * Caching is page-dependant. The lifetime can be different
-		 * for each page, also caching can be disabling on a per-page basis.
-		 * @link http://www.smarty.net/manual/en/variable.caching.php
-		 */
-		const CACHE_DYNAMIC = 2;
-
 		private $control = null;
 
 		public function __construct($cache = false, $cache_lifetime = 86400, $error = false)
@@ -33,18 +10,22 @@
 			// Initialize Smarty
 			parent::__construct();
 
-			// Change the default template directories
-			$this->template_dir = Renderer::$style_dir;
-			$this->compile_dir  = $this->template_dir.'compile/';
-			$this->config_dir   = $this->template_dir.'config/';
-			$this->cache_dir    = $this->template_dir.'cache/';
+			// Change the default template directories			
+			$this->setTemplateDir(Renderer::$style_dir);
+			$this->setCompileDir($this->template_dir[0].'compile/');
+			$this->setConfigDir($this->template_dir[0].'config/');
+			$this->setCacheDir($this->template_dir[0].'cache/');			
 
-			// Smarty3
+			// Smarty 3
 			$this->auto_literal = true;
 
 			// Change default caching behavior
-			$this->caching        = $cache ? self::CACHE_DYNAMIC : self::CACHE_DISABLED;
-			$this->cache_lifetime = $cache_lifetime;
+			$this->setCaching(Smarty::CACHING_LIFETIME_SAVED);
+			$this->setCacheLifetime($cache_lifetime);
+			
+			// Disable Smarty's built in error handler
+			//TODO: improve MY error handler!
+			$this->muteExpectedErrors();
 		}
 
 		/**
@@ -75,12 +56,12 @@
 			{
 				if(isset(Control::$caching))
 				{
-					$this->caching = Control::$caching === true ? self::CACHE_DYNAMIC : self::CACHE_DISABLED;
+					$this->caching = Control::$caching === true ? $this->setCaching(Smarty::CACHING_LIFETIME_SAVED) : self::CACHE_DISABLED;
 				}
 
 				if(isset(Control::$cache_lifetime))
 				{
-					$this->cache_lifetime = Control::$cache_lifetime;
+					$this->setCacheLifetime(Control::$cache_lifetime);
 				}
 
 				if(isset(Control::$cache_uid))
@@ -90,7 +71,7 @@
 
 				if($this->caching)
 				{
-					if(!$this->is_cached(Renderer::$template_file, $this->cache_id))
+					if(!$this->isCached(Renderer::$template_file, $this->cache_id))
 					{
 						try
 						{
@@ -128,7 +109,7 @@
 		 */
 		public function display_error(exception $exception)
 		{
-			$this->caching = 0;
+			$this->setCaching(Smarty::CACHING_LIFETIME_SAVED);
 			$request       = RequestHandler::$request;
 
 			$this->assign(array(
