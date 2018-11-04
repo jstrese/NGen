@@ -68,7 +68,7 @@
 
 				if($this->caching)
 				{
-					if(!$this->is_cached(Renderer::$template_file, $this->cache_id))
+					if(!$this->isCached(Renderer::$template_file, $this->cache_id))
 					{
 						try
 						{
